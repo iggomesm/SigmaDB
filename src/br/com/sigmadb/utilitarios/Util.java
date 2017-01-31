@@ -345,13 +345,7 @@ public class Util {
 			cnpjDesmascarado = cnpj.replaceAll("[.]*[-]*[/]*", "");
 		}
 		return cnpjDesmascarado;
-	}
-
-	public static long obterDiferencaDatasPorMinuto(Timestamp inicio,
-			Timestamp fim) {
-		DataUtil dataUtil = new DataUtil(inicio, fim);
-		return dataUtil.getDiferencaMinutosTotal();
-	}
+	}	
 
 	/**
 	 * 

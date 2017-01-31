@@ -350,9 +350,7 @@ public class ReflectionUtil {
 				&& !metodo.getName().startsWith(PREFIXO_METODO_GET_BOLEANO)) {
 			return false;
 		}
-
-		// se tiver o n�mero de parametros diferente de 0, n�o � um método
-		// getter
+		
 		if (metodo.getParameterTypes().length != 0) {
 			return false;
 		}
@@ -610,49 +608,6 @@ public class ReflectionUtil {
 		}
 
 		return colunasPK;
-	}
-
-	public static List<String> pegaAtributosExcluirConsulta(Class classe)
-			throws InstantiationException, IllegalAccessException {
-
-		List<String> colunasRemocao = new ArrayList<String>();
-
-		for (Field field : classe.getDeclaredFields()) {
-
-			Annotation[] annotation = field.getDeclaredAnnotations();
-
-			if (annotation.length > 0) {
-				for (Annotation annotation2 : annotation) {
-					if (annotation2 instanceof RemoveAtributoConsulta) {
-						colunasRemocao.add(field.getName().trim());
-					}
-				}
-			}
-		}
-
-		for (String colunaRemocao : colunasRemocao) {
-
-			List<String> listaMetodosget = listaNomeDosMetodosDoObjetoVO(
-					classe.newInstance(), PREFIXO_METODO_GET);
-
-		}
-
-		List<String> listaMetodosget = listaNomeDosMetodosDoObjetoVO(
-				classe.newInstance(), PREFIXO_METODO_GET);
-
-		List<String> nomesAtributos = new ArrayList<String>();
-
-		for (String metodoGet : listaMetodosget) {
-
-			String prefixo = metodoGet.startsWith(PREFIXO_METODO_GET) ? PREFIXO_METODO_GET
-					: PREFIXO_METODO_GET_BOLEANO;
-
-			metodoGet = metodoGet.replace(prefixo, "").toLowerCase();
-
-			nomesAtributos.add(metodoGet);
-		}
-
-		return nomesAtributos;
 	}
 
 	/**
