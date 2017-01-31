@@ -22,7 +22,7 @@ public class GenericComparator<T extends Object> implements Comparator<T> {
 	 * Constroi um GenericComparator de acordo com o campo e o tipo
 	 * 
 	 * @param sortField
-	 *            Campo para ordena��o
+	 *            Campo para ordenação
 	 * @param sortType
 	 *            Tipo de ordena��o, ascendente (ASC) ou descendente (DESC)
 	 */
