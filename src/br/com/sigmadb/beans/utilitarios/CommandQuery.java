@@ -15,14 +15,8 @@ import br.com.sigmadb.utilitarios.TableMaster;
 import br.com.sigmadb.utilitarios.Util;
 
 /**
- * Classe que agrupa filtros gen�ricos para consultas no sistema.
- * Agrupa restri��es de per�odo para uma ou mais colunas.
- * Agrupa restri��es do tipo IN para uma ou mais colunas.
- * Agrupa restri��es sobre campos nulos.
- * Armazena informa��es de contexto onde a consulta dever� ser realizada.
- * Aplica condi��es de ordena��o para o resultado da consulta. 
- * @author Igor Mois�s
- * @since 26/06/2015
+ * Classe responsável por aplicar qualquer tipo de restrição para uma consulta. 
+ * @author Igor Moisés
  */
 public class CommandQuery {
 
@@ -56,6 +50,9 @@ public class CommandQuery {
 		this.inicializaPropriedades(null);
 	}
 	
+	/**
+	 * @param connection Objeto de conexão aberta.
+	 */
 	private void inicializaPropriedades(ConnectionLog connection){
 		this.connectionLog = connection;
 		this.mapaRestricoesPeriodo = new HashMap<String, Periodo>();
@@ -72,8 +69,7 @@ public class CommandQuery {
 	}
 	
 	/**
-	 * @param contextoConsulta Contexto do banco onde a consulta dever� ser executada.
-	 * @see Constantes.CONEXAO_GAIA, Constantes.CONEXAO_TETIS. 
+	 * @param connection Objeto que representa uma conexão aberta com o banco. 
 	 */
 	public CommandQuery(ConnectionLog connection){
 		this.inicializaPropriedades(connection);
@@ -88,7 +84,7 @@ public class CommandQuery {
 	}
 
 	/**
-	 * <b>O objeto pode aplicar mais de uma restri��o do tipo per�odo na consulta. Basta inseri-las atrav�s deste m�todo.</b><br>
+	 * <b>O objeto pode aplicar mais de uma restrição do tipo período na consulta. Basta inseri-las através deste método.</b><br>
 	 * Cria no objeto uma restri��o do tipo per�odo que poder� ser aplicada numa consulta. 
 	 * Ex. nomeColuna >= dataInicialPeriodo and nomeColuna <= dataFinalPeriodo
 	 * @param nomeColuna Representa o nome de uma coluna de uma tabela, onde a restri��o de per�odo dever� ser aplicada. 

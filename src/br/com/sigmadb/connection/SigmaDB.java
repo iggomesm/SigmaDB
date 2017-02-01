@@ -3,6 +3,7 @@ package br.com.sigmadb.connection;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -32,16 +33,7 @@ import br.com.sigmadb.utilitarios.ReflectionUtil;
 import br.com.sigmadb.utilitarios.TableMaster;
 import br.com.sigmadb.utilitarios.Util;
 
-public class IntegracaoDAO {
-
-	private static IntegracaoDAO integracaoSigleton;
-
-	public static IntegracaoDAO getIntegracaoDAO() {
-		if (integracaoSigleton == null) {
-			integracaoSigleton = new IntegracaoDAO();
-		}
-		return integracaoSigleton;
-	}
+public class SigmaDB {
 
 	/**
 	 * Cria uma nova instância de conexão com o Banco. Ou seja, abre uma
@@ -296,7 +288,7 @@ public class IntegracaoDAO {
 			
 			sqlConsulta =  Util.isNullOrEmpty(sqlConsulta) ? name.toLowerCase() : sqlConsulta; 
 			
-			resultadoConsulta = this.pesquisaTabela(name.toLowerCase(), bean, command);
+			resultadoConsulta = this.pesquisaTabela(sqlConsulta, bean, command);
 		}
 		
 		return resultadoConsulta;
@@ -318,7 +310,7 @@ public class IntegracaoDAO {
 	 *         consulta.
 	 * @throws Exception
 	 */
-	public <E> List<E> pesquisaTabela(String sqlConsulta, E bean,
+	protected <E> List<E> pesquisaTabela(String sqlConsulta, E bean,
 			CommandQuery command) throws Exception {
 		//return this.pesquisaTabela(sqlConsulta, bean, null, command);
 		ConnectionLog connection = command.getConnectionLog();
@@ -382,10 +374,12 @@ public class IntegracaoDAO {
 		for (Iterator iter = propriedades.keySet().iterator(); iter.hasNext();) {
 			String propriedadeNome = (String) iter.next();
 
+			boolean diferenteNulo = verificaAtributoValorNulo(propriedadeNome, propriedades, bean); 
+			
 			if ((propriedadeNome != null)
 					&& !propriedadeNome.equalsIgnoreCase("class")
 					&& (propriedades.get(propriedadeNome) != null)
-					&& primitivoNULL(propriedadeNome, propriedades, bean)) {
+					&& diferenteNulo) {
 
 				String valorFormatado = TableMaster.pegaValorAtributoFormatado(
 						bean, propriedadeNome);
@@ -412,137 +406,163 @@ public class IntegracaoDAO {
 	}
 	
 	/**
-	 * Preeche uma lista de de vo com o conteudo de um result set
-	 * 
-	 * @param resultSet
-	 * @param propriedades
-	 * @param VO
-	 * @return
+	 * Converte o resultado de uma consulta, que está contido num {@link ResultSet} numa lista de objetos do mesmo tipo informado como parâmetro de filtro para consulta.
+	 * @param resultSet Objeto contendo o resultado da consulta.
+	 * @param propriedades Mapa contendo todas as propriedades que deverão ser preenchidas.
+	 * @param bean Instância de objeto que representará o tipo de elementos que irão compor a lista de retorno.
+	 * @return Lista de objetos do mesmo tipo da instância informada como parâmetro representando o resultado da consulta.
 	 * @throws Exception
 	 */
 	protected List preencherResultSet(ResultSet resultSet, Map propriedades,
-			Object VO) throws Exception {
+			Object bean) throws Exception {
+		
 		List resultado = new ArrayList();
+		
+		List<String> colunasResultSet = this.listaColunasResultSet(resultSet);
 
 		while (resultSet.next()) {
 
 			for (Iterator iter = propriedades.keySet().iterator(); iter
 					.hasNext();) {
+				
 				String propriedadeNome = (String) iter.next();
 
 				if ((propriedadeNome != null)
-						&& !propriedadeNome.equalsIgnoreCase("class")) {
-					String propriedadeTipo = PropertyUtils.getPropertyType(VO,
+						&& !propriedadeNome.equalsIgnoreCase("class")
+						&& colunasResultSet.contains(propriedadeNome.toLowerCase())) {
+					
+					String propriedadeTipo = PropertyUtils.getPropertyType(bean,
 							propriedadeNome).getName();
-					Object valor = getRs(resultSet, propriedadeTipo,
+					
+					Object valor = extraiValorResultSet(resultSet, propriedadeTipo,
 							propriedadeNome);
+					
 					propriedades.put(propriedadeNome, valor);
 				}
 			}
 
-			Class voClass = VO.getClass();
-			Object voInstace = voClass.newInstance();
-			BeanUtils.populate(voInstace, propriedades);
-			resultado.add(voInstace);
+			Class classeBean = bean.getClass();
+			Object instancia = classeBean.newInstance();
+			BeanUtils.populate(instancia, propriedades);
+			resultado.add(instancia);
 		}
 
 		return resultado;
 	}
-
+	
 	/**
-	 * Descobre pelo tipo o par�metro a obter do ResultSet.
-	 * 
-	 * @param rs
-	 * @param datatype
-	 * @param name
-	 * @return
+	 * Lista quais são as colunas existentes num {@link ResultSet}
+	 * @param rs Objeto contendo as colunas que deverão ser listadas.
+	 * @return Lista de Strings contendo o nome de cada coluna contida no {@link ResultSet}.
+	 * @throws SQLException
+	 */
+	private List<String> listaColunasResultSet(ResultSet rs) throws SQLException {
+		
+		List<String> colunasResultSet = new ArrayList<String>();
+		
+		ResultSetMetaData rsmd = rs.getMetaData();
+	    
+	    for (int x = 1; x <= rsmd.getColumnCount(); x++) {
+	    	colunasResultSet.add(rsmd.getColumnName(x).toLowerCase());
+	    }
+		
+		return colunasResultSet;
+	}
+	
+
+	
+	/**
+	 * Pega o valor contido no {@link ResultSet} para determinado atributo, com o mesmo nome da coluna do {@link ResultSet}.
+ 	 * @param resultSet Objeto que contém o resultado da consulta.
+	 * @param datatype Tipo do dado que deverá ser extraído do {@link ResultSet}
+	 * @param name Nome da coluna do {@link ResultSet}
+	 * @return Valor contido no {@link ResultSet} que são respectivos ao tipo e nome informados no parâmetro.
 	 * @throws Exception
 	 */
-	protected static Object getRs(ResultSet rs, String datatype, String name)
+	protected static Object extraiValorResultSet(ResultSet resultSet, String datatype, String name)
 			throws Exception {
 		if (datatype.equals("java.lang.String") || datatype.equals("String")) {
-			return rs.getString(name);
+			return resultSet.getString(name);
 		} else if (datatype.equals("java.sql.Date")) {
-			return rs.getDate(name);
+			return resultSet.getDate(name);
 		} else if (datatype.equals("java.sql.Timestamp")) {
-			return rs.getTimestamp(name);
+			return resultSet.getTimestamp(name);
 		} else if (datatype.equals("java.sql.Time")) {
-			return rs.getTime(name);
+			return resultSet.getTime(name);
 		} else if (datatype.equals("double")) {
-			return new Double(rs.getDouble(name));
+			return new Double(resultSet.getDouble(name));
 		} else if (datatype.equals("int")) {
-			return new Integer(rs.getInt(name));
+			return new Integer(resultSet.getInt(name));
 		} else if (datatype.equals("long")) {
-			return new Long(rs.getLong(name));
+			return new Long(resultSet.getLong(name));
 		} else if (datatype.equals("java.lang.Double")) {
-			return new Double(rs.getDouble(name));
+			return new Double(resultSet.getDouble(name));
 		} else if (datatype.equals("java.lang.Integer")) {
-			return new Integer(rs.getInt(name));
+			return new Integer(resultSet.getInt(name));
 		} else if (datatype.equals("java.lang.Long")) {
-			return new Long(rs.getLong(name));
+			return new Long(resultSet.getLong(name));
 		} else if (datatype.equals("java.lang.Float")) {
-			return new Float(rs.getFloat(name));
+			return new Float(resultSet.getFloat(name));
 		} else if (datatype.equals("java.lang.Short")) {
-			return new Short(rs.getShort(name));
+			return new Short(resultSet.getShort(name));
 		} else if (datatype.equals("java.lang.Byte")) {
-			return new Byte(rs.getByte(name));
+			return new Byte(resultSet.getByte(name));
 		} else if (datatype.equals("java.math.BigDecimal")) {
-			return rs.getBigDecimal(name);
+			return resultSet.getBigDecimal(name);
 		} else if (datatype.equals("java.io.InputStream")) {
-			return rs.getAsciiStream(name);
+			return resultSet.getAsciiStream(name);
 		} else if (datatype.equals("boolean")) {
-			return new Boolean(rs.getBoolean(name));
+			return new Boolean(resultSet.getBoolean(name));
 		} else if (datatype.equals("java.sql.Array")) {
-			return rs.getArray(name);
+			return resultSet.getArray(name);
 		} else if (datatype.equals("java.sql.Blob")) {
-			return rs.getBlob(name);
+			return resultSet.getBlob(name);
 		} else if (datatype.equals("java.sql.Clob")) {
-			return rs.getClob(name);
+			return resultSet.getClob(name);
 		} else {
-			return rs.getObject(name);
+			return resultSet.getObject(name);
 		}
 	}
 
+	
 	/**
-	 * Retorna falso caso a prpriedade do tipo primitivo int ou double seja
-	 * igual a zero
-	 * 
-	 * @param propriedadeNome
-	 * @param propriedades
-	 * @param vo
-	 * @return
+	 * Verifica se o valor do atributo é nulo ou zero.
+	 * @param nomeAtributo Nome do atributo a ser verificado.
+	 * @param propriedades Mapa contendo todos os atributos do objeto com seus respectivos valores.
+	 * @param bean Instância do objeto Bean a ser verificado.
+	 * @return False caso o atributo seja nulo ou zerado. True caso possua algum valor.
 	 * @throws Exception
 	 */
-	private boolean primitivoNULL(String propriedadeNome, Map propriedades,
-			Object vo) throws Exception {
-		String propriedadeTipo = PropertyUtils.getPropertyType(vo,
-				propriedadeNome).getName();
+	private boolean verificaAtributoValorNulo(String nomeAtributo, Map propriedades,
+			Object bean) throws Exception {
+		String propriedadeTipo = PropertyUtils.getPropertyType(bean,
+				nomeAtributo).getName();
 
 		if ("int".equals(propriedadeTipo)
-				&& "0".equals(propriedades.get(propriedadeNome))) {
+				&& "0".equals(propriedades.get(nomeAtributo))) {
 			return false;
 		}
 
 		if ("double".equals(propriedadeTipo)
-				&& "0.0".equals(propriedades.get(propriedadeNome))) {
+				&& "0.0".equals(propriedades.get(nomeAtributo))) {
 			return false;
 		}
 
 		if ("java.lang.String".equals(propriedadeTipo)
-				&& ("".equals(propriedades.get(propriedadeNome)) || "null"
+				&& ("".equals(propriedades.get(nomeAtributo)) || "null"
 						.equalsIgnoreCase(String.valueOf(propriedades
-								.get(propriedadeNome))))) {
+								.get(nomeAtributo))))) {
 			return false;
 		}
 
 		if ("long".equals(propriedadeTipo)
-				&& "0".equals(propriedades.get(propriedadeNome))) {
+				&& "0".equals(propriedades.get(nomeAtributo))) {
 			return false;
 		}
 
 		if ("java.sql.Timestamp".equals(propriedadeTipo)
 				&& "null".equalsIgnoreCase(String.valueOf(propriedades
-						.get(propriedadeNome)))) {
+						.get(nomeAtributo)))) {
 			return false;
 		}
 
@@ -561,12 +581,6 @@ public class IntegracaoDAO {
 			Object valor = ReflectionUtil.getValorMetodoGet(vo, atributo);
 			propriedades.put(atributo, String.valueOf(valor));
 		}
-
-		// Map propriedades = BeanUtils.describe(vo);
-
-		/**
-		 * Formatando nomes das propriedades para ignorar case.
-		 */
 		List remover = new ArrayList();
 
 		for (Iterator iter = propriedades.keySet().iterator(); iter.hasNext();) {

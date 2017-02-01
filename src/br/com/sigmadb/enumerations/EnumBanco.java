@@ -3,7 +3,7 @@ package br.com.sigmadb.enumerations;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.sigmadb.connection.IntegracaoDAO;
+import br.com.sigmadb.connection.SigmaDB;
 
 public enum EnumBanco {
 
@@ -17,7 +17,13 @@ public enum EnumBanco {
 	
 	private static void preparaTabelasPostgres(String consulta) {
 		try {
-			List<Pg_tables> resultadoConsulta = IntegracaoDAO.getIntegracaoDAO().pesquisaTabela(consulta, new Pg_tables(), null);
+			
+			Pg_tables tables = new Pg_tables();
+			tables.setSchemaname("public");
+			
+			SigmaDB sigma = new SigmaDB();
+			
+			List<Pg_tables> resultadoConsulta = sigma.pesquisaTabela(tables, null);
 			
 			for (Pg_tables pg_tables : resultadoConsulta) {
 				tabelas.add(pg_tables.getTablename().trim().toLowerCase());
