@@ -17,7 +17,7 @@ This is another date class, but more convenient that
 <tt>java.util.Date</tt> or <tt>java.util.Calendar</tt>
 
 @version 1.20 5 Oct 1998
-@author Cay Horstmann e Paulo Sobreira
+@author Cay Horstmann 
 */
 public class Day implements Cloneable, Serializable {
     private static final long serialVersionUID = 5884622348312431542L;
@@ -59,10 +59,10 @@ public class Day implements Cloneable, Serializable {
     public Day(String data) throws Exception{
         this(System.currentTimeMillis());
 
-        if (!Util.isNullOrEmpty(data)) {
+        if (!SigmaDBUtil.isNullOrEmpty(data)) {
             Timestamp timestamp;
 
-            timestamp = Util.converteStringTimestamp(data);
+            timestamp = SigmaDBUtil.converteStringTimestamp(data);
 
             GregorianCalendar todaysDate = new GregorianCalendar();
             todaysDate.setTimeInMillis(timestamp.getTime());
@@ -106,7 +106,7 @@ public class Day implements Cloneable, Serializable {
     }
 
     public int getCompetencia() {
-        return Util.parseStringToInt(prec4.format(getYear())+ "" +
+        return SigmaDBUtil.parseStringToInt(prec4.format(getYear())+ "" +
             prec2.format(getMonth())+""+prec2.format(getDay()));
     }
 

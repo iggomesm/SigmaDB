@@ -1,21 +1,17 @@
 package br.com.sigmadb.beans.utilitarios;
 
 /**
- * Classe que representa a restri��o de filtro para um determinado atributo de um objeto de uma lista.
- * @author Igor Mois�s
- *
+ * Representa um filtro onde determina-se a descrição de um atributo de algum objeto e um valor para o mesmo.
+ * @author Igor Moisés
  */
-public class Filtro {
+public class BeanFilter<T> {
 
 	private String nomePropriedade;
 	private String valorPropriedade;
 	
-	public Filtro(String nomePropriedade, String valorPropriedade){
+	public BeanFilter(String nomePropriedade, String valorPropriedade){
 		this.nomePropriedade = nomePropriedade;
-		// Tarefa: 1401 - Igor Mois�s (Inicio)
-		/*this.valorPropriedade = valorPropriedade;*/
-		this.valorPropriedade = String.valueOf(valorPropriedade);
-		// Tarefa: 1401 - Igor Mois�s (Fim)
+		this.valorPropriedade = String.valueOf(valorPropriedade);		
 	}
 	
 	public String getNomePropriedade() {
@@ -30,7 +26,4 @@ public class Filtro {
 	public void setValorPropriedade(String valorPropriedade) {
 		this.valorPropriedade = valorPropriedade;
 	}
-	
-	
-	
 }

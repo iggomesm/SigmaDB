@@ -34,14 +34,14 @@ import javax.swing.text.MaskFormatter;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import br.com.sigmadb.beans.utilitarios.Filtro;
+import br.com.sigmadb.beans.utilitarios.BeanFilter;
 import br.com.sigmadb.beans.utilitarios.Ordenacao;
 import br.com.sigmadb.enumerations.EnumFiltroLista;
 import br.com.sigmadb.enumerations.EnumSortType;
 import br.com.sigmadb.enumerations.EnumTipoMapeamento;
 import br.com.sigmadb.exceptions.SigmaDBException;
 
-public class Util {
+public class SigmaDBUtil {
 
 	public static Locale loc_brasil = new Locale("pt", "BR");
 	public static DecimalFormat decimalFormat = new DecimalFormat("0.00");
@@ -323,7 +323,7 @@ public class Util {
 	public static String removeMascaraCPF(String cpf) {
 		String cpfDesmascarado = null;
 
-		if (!Util.isNullOrEmpty(cpf)) {
+		if (!SigmaDBUtil.isNullOrEmpty(cpf)) {
 			cpfDesmascarado = cpf.replaceAll("[.]*[-]*", "");
 		}
 
@@ -341,7 +341,7 @@ public class Util {
 
 		String cnpjDesmascarado = null;
 
-		if (!Util.isNullOrEmpty(cnpj)) {
+		if (!SigmaDBUtil.isNullOrEmpty(cnpj)) {
 			cnpjDesmascarado = cnpj.replaceAll("[.]*[-]*[/]*", "");
 		}
 		return cnpjDesmascarado;
@@ -484,18 +484,18 @@ public class Util {
 		List resultado = new ArrayList();
 
 		for (Object vo : listaBean) {
-			Object valor = ReflectionUtil.getValorMetodoGet(vo, propriedade);
+			Object valor = SigmaDBReflectionUtil.getValorMetodoGet(vo, propriedade);
 			boolean adicionaValor = true;
-			Class classeDoValor = ReflectionUtil.pegaTipoDoMetodoGet(vo,
-					ReflectionUtil.getNomeMetodoGet(propriedade));
+			Class classeDoValor = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(vo,
+					SigmaDBReflectionUtil.getNomeMetodoGet(propriedade));
 
 			if (removeValoresZerados) {
 
 				if (classeDoValor.getName().equalsIgnoreCase(
 						String.class.getName())) {
-					adicionaValor = !Util.isNullOrEmpty((String) valor);
+					adicionaValor = !SigmaDBUtil.isNullOrEmpty((String) valor);
 				} else if (verificaSeTipoNumerico(classeDoValor)) {
-					adicionaValor = (Util.parseStringToInt(String
+					adicionaValor = (SigmaDBUtil.parseStringToInt(String
 							.valueOf(valor)) != 0);
 				}
 			}
@@ -556,7 +556,7 @@ public class Util {
 	 * @return Lista filtrada de acordo com os parâmetros informados.
 	 * @throws Exception
 	 */
-	public static List filtraLista(List lista, Filtro filtro,
+	public static List filtraLista(List lista, BeanFilter filtro,
 			EnumFiltroLista metodoFiltro) throws Exception {
 		ordenaLista(lista, filtro.getNomePropriedade(), EnumSortType.ASC);
 		return aplicaFiltroEmLista(lista, new FiltroListaGenerico<Object>(
@@ -589,13 +589,13 @@ public class Util {
 	 * @return Lista filtrada de acordo com os parâmetros informados.
 	 * @throws Exception
 	 */
-	public static List filtraLista(List lista, List<Filtro> filtros,
+	public static List filtraLista(List lista, List<BeanFilter> filtros,
 			EnumFiltroLista metodoFiltro) throws Exception {
 
 		validaFiltrosDeLista(filtros);
 
 		List<Ordenacao> listaOrdenacao = new ArrayList<Ordenacao>();
-		for (Filtro filtro : filtros) {
+		for (BeanFilter filtro : filtros) {
 			listaOrdenacao.add(new Ordenacao(filtro.getNomePropriedade(),
 					EnumSortType.ASC));
 		}
@@ -705,10 +705,10 @@ public class Util {
 	 *            Lista contendo os filtros que serão validados.
 	 * @throws Exception
 	 */
-	private static void validaFiltrosDeLista(List<Filtro> filtroVO)
+	private static void validaFiltrosDeLista(List<BeanFilter> filtroVO)
 			throws Exception {
 
-		List<Filtro> listaFiltros = new ArrayList<Filtro>();
+		List<BeanFilter> listaFiltros = new ArrayList<BeanFilter>();
 		listaFiltros.addAll(filtroVO);
 
 		Map<String, List> mapaFiltros = new HashMap<String, List>();
@@ -783,7 +783,7 @@ public class Util {
 
 		List listaValores;
 
-		if (Util.isNullOrEmpty(nomeAtributo)) {
+		if (SigmaDBUtil.isNullOrEmpty(nomeAtributo)) {
 			listaValores = lista;
 		} else {
 			listaValores = listaPropriedadeObjeto(lista, nomeAtributo, true);
@@ -891,8 +891,8 @@ public class Util {
 
 			K chaveMapa = (K) valor;
 
-			if (!Util.isNullOrEmpty(campoChave)) {
-				chaveMapa = (K) ReflectionUtil.getValorMetodoGet(valor,
+			if (!SigmaDBUtil.isNullOrEmpty(campoChave)) {
+				chaveMapa = (K) SigmaDBReflectionUtil.getValorMetodoGet(valor,
 						campoChave);
 				if (transformaChaveEmString) {
 					chaveMapa = (K) String.valueOf(chaveMapa);
@@ -954,8 +954,8 @@ public class Util {
 
 			K chaveMapa = (K) valor;
 
-			if (!Util.isNullOrEmpty(campoChave)) {
-				chaveMapa = (K) ReflectionUtil.getValorMetodoGet(valor,
+			if (!SigmaDBUtil.isNullOrEmpty(campoChave)) {
+				chaveMapa = (K) SigmaDBReflectionUtil.getValorMetodoGet(valor,
 						campoChave);
 				if (transformaChaveEmString) {
 					chaveMapa = (K) String.valueOf(chaveMapa);
@@ -983,7 +983,7 @@ public class Util {
 	public static String[] pegaAtributosExcluirConsulta(Object objectBean,
 			String... prefixosAtributosExclusao) {
 
-		List nomesAtributos = ReflectionUtil
+		List nomesAtributos = SigmaDBReflectionUtil
 				.listaNomeDosAtributosDoObjetoVO(objectBean);
 
 		List<String> listaAtributosExclusao = new ArrayList<String>();

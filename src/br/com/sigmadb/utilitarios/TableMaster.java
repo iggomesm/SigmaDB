@@ -56,8 +56,8 @@ public abstract class TableMaster {
 	 */
 	protected String toInsert(Object objeto) throws Exception {
 
-		String nomeTabela = Util.pegaNomeTabela(objeto);
-		List<String> listaAtributos = ReflectionUtil
+		String nomeTabela = SigmaDBUtil.pegaNomeTabela(objeto);
+		List<String> listaAtributos = SigmaDBReflectionUtil
 				.listaNomeDosAtributosDoObjetoVO(objeto);
 
 		StringBuffer sql = new StringBuffer("INSERT INTO "
@@ -66,7 +66,7 @@ public abstract class TableMaster {
 		StringBuffer colunas = new StringBuffer(" (");
 		StringBuffer valores = new StringBuffer(" (");
 
-		String colunaPk = (String)Util.getFirst(ReflectionUtil.pegaColunasPK(objeto.getClass()));
+		String colunaPk = (String)SigmaDBUtil.getFirst(SigmaDBReflectionUtil.pegaColunasPK(objeto.getClass()));
 		
 		for (Iterator iterator = listaAtributos.iterator(); iterator.hasNext();) {
 			String atributo = (String) iterator.next();
@@ -91,7 +91,7 @@ public abstract class TableMaster {
 			
 			if (!atributo.equals(colunaPk)){
 
-				String nomeMetodoGet = ReflectionUtil.getNomeMetodoGet(atributo);
+				String nomeMetodoGet = SigmaDBReflectionUtil.getNomeMetodoGet(atributo);
 
 				String valorFormatado = this.pegaValorAtributoFormatado(objeto,
 						atributo);
@@ -124,8 +124,8 @@ public abstract class TableMaster {
 	 */
 	protected String toUpdate(Object objeto) throws Exception {
 
-		String nomeTabela = Util.pegaNomeTabela(objeto);
-		List<String> listaAtributos = ReflectionUtil
+		String nomeTabela = SigmaDBUtil.pegaNomeTabela(objeto);
+		List<String> listaAtributos = SigmaDBReflectionUtil
 				.listaNomeDosAtributosDoObjetoVO(objeto);
 
 		StringBuffer sql = new StringBuffer("UPDATE "
@@ -162,7 +162,7 @@ public abstract class TableMaster {
 	 */
 	protected String toDelete(Object objeto) throws Exception {
 
-		String nomeTabela = Util.pegaNomeTabela(objeto);
+		String nomeTabela = SigmaDBUtil.pegaNomeTabela(objeto);
 
 		StringBuffer sql = new StringBuffer("DELETE FROM "
 				+ nomeTabela.toUpperCase());
@@ -194,7 +194,7 @@ public abstract class TableMaster {
 		
 		StringBuffer clausulaWhere = new StringBuffer(where);
 
-		List<String> listaPk = ReflectionUtil.pegaColunasPK(objeto.getClass());
+		List<String> listaPk = SigmaDBReflectionUtil.pegaColunasPK(objeto.getClass());
 
 		for (Iterator iterator = listaPk.iterator(); iterator.hasNext();) {
 			String atributo = (String) iterator.next();
@@ -237,12 +237,12 @@ public abstract class TableMaster {
 
 		String retorno = "";
 
-		if (!Util.isNullOrEmpty(nomeAtributo)) {
+		if (!SigmaDBUtil.isNullOrEmpty(nomeAtributo)) {
 
-			String nomeMetodoGet = ReflectionUtil
+			String nomeMetodoGet = SigmaDBReflectionUtil
 					.getNomeMetodoGet(nomeAtributo);
 
-			Class tipo = ReflectionUtil.pegaTipoDoMetodoGet(objeto,
+			Class tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(objeto,
 					nomeMetodoGet);
 
 			boolean ehNumerico = tipo.getName().equalsIgnoreCase(
@@ -262,13 +262,13 @@ public abstract class TableMaster {
 					|| tipo.getName().equalsIgnoreCase(
 							java.sql.Timestamp.class.getName());
 
-			Object valor = ReflectionUtil.pegaValorDoMetodoGet(objeto,
+			Object valor = SigmaDBReflectionUtil.pegaValorDoMetodoGet(objeto,
 					nomeMetodoGet);
 
 			if (valor != null) {
 				if (aplicaAspasSimples) {
 
-					retorno = Util.aspasSimples(String.valueOf(valor));
+					retorno = SigmaDBUtil.aspasSimples(String.valueOf(valor));
 
 				} else if (ehNumerico) {
 

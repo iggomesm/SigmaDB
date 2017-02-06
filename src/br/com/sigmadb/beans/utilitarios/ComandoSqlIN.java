@@ -2,16 +2,15 @@ package br.com.sigmadb.beans.utilitarios;
 
 import java.util.List;
 
-import br.com.sigmadb.utilitarios.Util;
+import br.com.sigmadb.utilitarios.SigmaDBUtil;
 
 /**
  * Classe utilizada para a aplicação de restrições do tipo IN nas consultas SQL.
  * <br><b>nomePropriedade - </b> Nome da coluna na qual a restrição IN deverá ser aplicada.
  * <br><b>arrayIds -</b>  Todos os IDS que serão utilizados na restrição IN a ser aplicada na coluna definida no atributo nomePropriedade.
  * @author Igor Moisés
- * @since 09/06/2014
  */
-public class CommandSqlIN {
+public class ComandoSqlIN {
 	/**
 	 * Guardará o nome da coluna na qual a restrição IN deverá ser aplicada.
 	 */
@@ -31,7 +30,7 @@ public class CommandSqlIN {
 	 * @param nomePropriedade Nome da coluna na qual a restrição IN deverá ser aplicada.
 	 * @param arrayIds Todos os IDS que serão utilizados na restrição IN a ser aplicada na coluna definida no atributo nomePropriedade.
 	 */
-	public CommandSqlIN(String nomePropriedade, String[] arrayIds) {
+	public ComandoSqlIN(String nomePropriedade, String[] arrayIds) {
 		this.nomePropriedade = nomePropriedade;
 		this.arrayIds = arrayIds;
 	}
@@ -39,7 +38,7 @@ public class CommandSqlIN {
 	/**
 	 * @param nomePropriedade Nome da coluna na qual a restrição IN deverá ser aplicada.
 	 */
-	public CommandSqlIN(String nomePropriedade) {
+	public ComandoSqlIN(String nomePropriedade) {
 		this.nomePropriedade = nomePropriedade;
 	}
 	
@@ -49,7 +48,7 @@ public class CommandSqlIN {
 	 * @param notIn para indicar se será usado a propriedade in ou not in. Caso true será
 	 * usado not in, false para usar in. 
 	 */
-	public CommandSqlIN(String nomePropriedade, String[] arrayIds, boolean notIn) {
+	public ComandoSqlIN(String nomePropriedade, String[] arrayIds, boolean notIn) {
 		this.nomePropriedade = nomePropriedade;
 		this.arrayIds = arrayIds;
 		this.notIn = notIn;
@@ -60,12 +59,12 @@ public class CommandSqlIN {
 	 * @param notIn para indicar se será usado a propriedade in ou not in. Caso true será
 	 * usado not in, false para usar in. 
 	 */
-	public CommandSqlIN(String nomePropriedade, boolean notIn) {
+	public ComandoSqlIN(String nomePropriedade, boolean notIn) {
 		this.nomePropriedade = nomePropriedade;
 		this.notIn = notIn;
 	}
 	
-	public CommandSqlIN() {}
+	public ComandoSqlIN() {}
 	
 	public String getNomePropriedade() {
 		return nomePropriedade;
@@ -114,13 +113,13 @@ public class CommandSqlIN {
 	 */
 	public void populaArrayIds(List listaPrincipalVO, String nomePropriedadeListada, boolean removeValoresZerados, boolean removeValoresRepetidos, boolean valorEntreAspas) throws Exception{
 		
-		if (!Util.isNullOrEmpty(listaPrincipalVO)){
+		if (!SigmaDBUtil.isNullOrEmpty(listaPrincipalVO)){
 			
-			List listaPropriedades = Util.listaPropriedadeObjeto(listaPrincipalVO, nomePropriedadeListada, removeValoresZerados, removeValoresRepetidos, valorEntreAspas);
+			List listaPropriedades = SigmaDBUtil.listaPropriedadeObjeto(listaPrincipalVO, nomePropriedadeListada, removeValoresZerados, removeValoresRepetidos, valorEntreAspas);
 			
-			if (!Util.isNullOrEmpty(listaPropriedades)){
+			if (!SigmaDBUtil.isNullOrEmpty(listaPropriedades)){
 				
-				this.arrayIds = Util.concatenaValoresDaLista(listaPropriedades, null).split(",");
+				this.arrayIds = SigmaDBUtil.concatenaValoresDaLista(listaPropriedades, null).split(",");
 			}
 			
 		}
@@ -157,11 +156,11 @@ public class CommandSqlIN {
 	 */
 	public void populaArrayIds(List listaPrincipal, boolean valorEntreAspas) throws Exception{
 		
-		if (!Util.isNullOrEmpty(listaPrincipal)){
+		if (!SigmaDBUtil.isNullOrEmpty(listaPrincipal)){
 			
-			String ids = Util.concatenaValoresDaLista(listaPrincipal, null, valorEntreAspas);
+			String ids = SigmaDBUtil.concatenaValoresDaLista(listaPrincipal, null, valorEntreAspas);
 			
-			if (!Util.isNullOrEmpty(ids)){
+			if (!SigmaDBUtil.isNullOrEmpty(ids)){
 				
 				String [] arrayIds = ids.split(",");
 				

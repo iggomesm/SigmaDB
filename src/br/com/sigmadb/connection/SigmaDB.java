@@ -12,26 +12,23 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
+import br.com.sigmadb.beans.utilitarios.BeanFilter;
+import br.com.sigmadb.beans.utilitarios.ComandoSqlIN;
 import br.com.sigmadb.beans.utilitarios.CommandQuery;
-import br.com.sigmadb.beans.utilitarios.CommandQuery.CommandNull;
-import br.com.sigmadb.beans.utilitarios.CommandQuery.Periodo;
-import br.com.sigmadb.beans.utilitarios.CommandQuery.RestricaoMaiorMenor;
-import br.com.sigmadb.beans.utilitarios.CommandSqlIN;
-import br.com.sigmadb.beans.utilitarios.Filtro;
 import br.com.sigmadb.beans.utilitarios.Ilog;
 import br.com.sigmadb.beans.utilitarios.Ordenacao;
 import br.com.sigmadb.enumerations.EnumOperacaoBD;
 import br.com.sigmadb.exceptions.SigmaDBException;
 import br.com.sigmadb.utilitarios.ConnectionLog;
-import br.com.sigmadb.utilitarios.ReflectionUtil;
+import br.com.sigmadb.utilitarios.Filtro;
+import br.com.sigmadb.utilitarios.SigmaDBReflectionUtil;
+import br.com.sigmadb.utilitarios.SigmaDBUtil;
 import br.com.sigmadb.utilitarios.TableMaster;
-import br.com.sigmadb.utilitarios.Util;
 
 public class SigmaDB {
 
@@ -217,11 +214,11 @@ public class SigmaDB {
 		
 		if (connectionLog.isGeraEstruturaIlog()) {
 
-			String nomeTabela = Util.pegaNomeTabela(tableMaster);
+			String nomeTabela = SigmaDBUtil.pegaNomeTabela(tableMaster);
 
-			String colunaPk = (String) Util.getFirst(ReflectionUtil
+			String colunaPk = (String) SigmaDBUtil.getFirst(SigmaDBReflectionUtil
 					.pegaColunasPK(tableMaster.getClass()));
-			int pk_tabela = (Integer) ReflectionUtil.getValorMetodoGet(tableMaster,
+			int pk_tabela = (Integer) SigmaDBReflectionUtil.getValorMetodoGet(tableMaster,
 					colunaPk);
 
 			Timestamp dataHoraAtual = new Timestamp(new Date().getTime());
@@ -266,14 +263,14 @@ public class SigmaDB {
 		
 		List<E> resultadoConsulta = null;
 
-		if (ReflectionUtil.isGroupTableMaster(bean)) {
+		if (SigmaDBReflectionUtil.isGroupTableMaster(bean)) {
 
 			if (command == null) {
 				throw new SigmaDBException(
 						"Não é possível consultar Beans, que agrupam mais de uma tabela, sem que o CommandQuery seja informado.");
 			}
 
-			if (command != null && Util.isNullOrEmpty(command.getTabelaFrom())) {
+			if (command != null && SigmaDBUtil.isNullOrEmpty(command.getTabelaFrom())) {
 				throw new SigmaDBException(
 						"Não é possível consultar Beans, que agrupam mais de uma tabela, sem que a propriedade \"tabelaFrom\" da classe CommandQuery tenha sido informada.");
 			}
@@ -286,7 +283,7 @@ public class SigmaDB {
 			
 			String sqlConsulta = command != null ? command.getTabelaFrom() : null;
 			
-			sqlConsulta =  Util.isNullOrEmpty(sqlConsulta) ? name.toLowerCase() : sqlConsulta; 
+			sqlConsulta =  SigmaDBUtil.isNullOrEmpty(sqlConsulta) ? name.toLowerCase() : sqlConsulta; 
 			
 			resultadoConsulta = this.pesquisaTabela(sqlConsulta, bean, command);
 		}
@@ -352,24 +349,24 @@ public class SigmaDB {
 
 		if (command != null) {
 
-			List<String> listaJoins = command.getListaRestricaoJoin();
+			List<String> listaJoins = command.getListaJoin();
 			for (String join : listaJoins) {
 				sqlConsulta += join;
 				sqlConsulta += " ";
 			}
 		}
 
-		where += this.preparaRestricaoCommandConsulta(command);		
+		where += this.preparaClausulaWhereCommandQuery(command);		
 
-		if (Util.isNullOrEmpty(sqlConsulta)) {
-			query = new StringBuffer("SELECT * FROM " + Util.pegaNomeTabela(bean));
+		if (SigmaDBUtil.isNullOrEmpty(sqlConsulta)) {
+			query = new StringBuffer("SELECT * FROM " + SigmaDBUtil.pegaNomeTabela(bean));
 		} else if (!sqlConsulta.toLowerCase().contains("select")){
 			query = new StringBuffer("SELECT * FROM " + sqlConsulta);
 		} else {
 			query = new StringBuffer(sqlConsulta);
 		}
 
-		boolean adiciouRestricao = !Util.isNullOrEmpty(where);
+		boolean adiciouRestricao = !SigmaDBUtil.isNullOrEmpty(where);
 
 		for (Iterator iter = propriedades.keySet().iterator(); iter.hasNext();) {
 			String propriedadeNome = (String) iter.next();
@@ -391,7 +388,7 @@ public class SigmaDB {
 			}
 		}
 
-		if (!Util.isNullOrEmpty(where)) {
+		if (!SigmaDBUtil.isNullOrEmpty(where)) {
 			query.append(" WHERE ");
 			query.append(where);
 			query.append(" ");
@@ -574,11 +571,11 @@ public class SigmaDB {
 			InvocationTargetException, NoSuchMethodException {
 		Map propriedades = new HashMap();
 
-		List<String> listaAtributos = ReflectionUtil
+		List<String> listaAtributos = SigmaDBReflectionUtil
 				.listaNomeDosAtributosDoObjetoVO(vo);
 
 		for (String atributo : listaAtributos) {
-			Object valor = ReflectionUtil.getValorMetodoGet(vo, atributo);
+			Object valor = SigmaDBReflectionUtil.getValorMetodoGet(vo, atributo);
 			propriedades.put(atributo, String.valueOf(valor));
 		}
 		List remover = new ArrayList();
@@ -601,19 +598,19 @@ public class SigmaDB {
 	}
 
 	/**
-	 * Monta uma restri��o do tipo IN para uma determinada coluna.
+	 * Monta uma restriçãoo do tipo IN para uma determinada coluna.
 	 * 
 	 * @param restricao
-	 *            Objeto que conter� o nome de uma coluna da consulta e um
-	 *            conjunto de Ids onde ser� aplicada a restri��o IN para a
+	 *            Objeto que conterá o nome de uma coluna da consulta e um
+	 *            conjunto de Ids onde será aplicada a restrição IN para a
 	 *            coluna.
-	 * @return String contendo a cl�usula IN. Caso n�o seja informado uma
-	 *         restri��o, ou n�o seja informado um nome de propriedade na
-	 *         restri��o, ou n�o sejam informados Ids na restri��o, ser�
+	 * @return String contendo a cláusula IN. Caso não seja informado uma
+	 *         restriçãoo, ou não seja informado um nome de propriedade na
+	 *         restrição, ou não sejam informados Ids na restrição, será
 	 *         retornada uma String em branco.
-	 * @see {@link CommandSqlIN}
+	 * @see {@link ComandoSqlIN}
 	 */
-	protected String whereIn(CommandSqlIN restricao) {
+	protected String whereIn(ComandoSqlIN restricao) {
 
 		String where = "";
 
@@ -621,7 +618,7 @@ public class SigmaDB {
 
 			boolean aplicaFiltro = restricao.getArrayIds() != null
 					&& restricao.getArrayIds().length > 0
-					&& !Util.isNullOrEmpty(restricao.getNomePropriedade());
+					&& !SigmaDBUtil.isNullOrEmpty(restricao.getNomePropriedade());
 
 			if (aplicaFiltro) {
 				where += restricao.getNomePropriedade() + " "
@@ -631,18 +628,12 @@ public class SigmaDB {
 
 		return where;
 	}
-
+	
 	/**
-	 * M�TODO QUE TEM COMO FUNCAO MONTAR UM CLAUSULA IN PA DETERMINADA PESQUISA
-	 * DE CAMPO
-	 * 
-	 * @param String
-	 *            [] valores - Valores a serem preenchidos na clausula in Ex:
-	 *            String [] valores = {"10","12"} == in(10, 12)
-	 * @param aspasSimples
-	 *            - Utilizado para colocar aspas quando for fazer a pesquisa de
-	 *            valores que sao caractere Ex: String [] valores = {"10","12"}
-	 *            == in('10', '12') - true coloca aspas, false n�o coloca aspas
+	 * Monta uma String contendo uma cláusula IN.
+	 * @param valores Valores que irão compor a cláusula.
+	 * @param aspasSimples Se true inclui aspas simples nos valores, se false não inclui.
+	 * @return String conteno a cláusula in.
 	 */
 	protected String whereIn(String[] valores, boolean aspasSimples) {
 		if (valores.length == 0) {
@@ -655,7 +646,7 @@ public class SigmaDB {
 			String valor = valores[i];
 
 			if (aspasSimples) {
-				valor = Util.aspasSimples(valor);
+				valor = SigmaDBUtil.aspasSimples(valor);
 			}
 
 			if (i < valores.length - 1) {
@@ -680,7 +671,7 @@ public class SigmaDB {
 	 *         <b>ATENÇÃO:Caso nenhuma restrição tenha sido inserida no objeto,
 	 *         será retornada uma String em branco.</b>
 	 */
-	private String preparaRestricaoCommandConsulta(
+	private String preparaClausulaWhereCommandQuery(
 			CommandQuery commandConsultaVO) {
 
 		StringBuilder where = new StringBuilder("");
@@ -691,51 +682,35 @@ public class SigmaDB {
 
 			boolean adicionaVirgula = false;
 
-			List<Periodo> listaRestricoesPeriodo = this
-					.montaListaRestricaoPeriodos(commandConsultaVO);
-
-			for (Periodo restricaoPeriodo : listaRestricoesPeriodo) {
-				where.append(" and ");
-				where.append(restricaoPeriodo.toString());
-				adiciouClausula = true;
-			}
-
-			List<CommandSqlIN> listaRestricaoIN = commandConsultaVO
+			List<ComandoSqlIN> listaRestricaoIN = commandConsultaVO
 					.getListaRestricoesIN();
 
-			for (CommandSqlIN restricaoSqlIN : listaRestricaoIN) {
+			for (ComandoSqlIN restricaoSqlIN : listaRestricaoIN) {
 				where.append(this.whereIn(restricaoSqlIN));
 			}
+			
+			adiciouClausula = !SigmaDBUtil.isNullOrEmpty(where.toString());
 
-			List<CommandNull> listaRestricaoNull = commandConsultaVO
-					.getListaRestricaoNull();
-
-			String restricaoNullQuery = montaRestricaoNullcommandConsulta(commandConsultaVO);
-			where.append(restricaoNullQuery);
-
+			String restricaoAND = this.montaRestricaoANDcommandConsulta(commandConsultaVO, adiciouClausula);
+			where.append(restricaoAND);
+			
+			adiciouClausula = !SigmaDBUtil.isNullOrEmpty(restricaoAND);
+			
 			String restricaoOR = this
-					.montaRestricaoORcommandConsulta(commandConsultaVO);
+					.montaRestricaoORcommandConsulta(commandConsultaVO, adiciouClausula);
 			where.append(restricaoOR);
-
-			String restricaoIgualdade = this
-					.montaRestricaoIgualdadecommandConsulta(commandConsultaVO);
-			where.append(restricaoIgualdade);
-
-			String restricaoDiferenca = this
-					.montaRestricaoDiferencacommandConsulta(commandConsultaVO);
-			where.append(restricaoDiferenca);
-
+			
+			adiciouClausula = !SigmaDBUtil.isNullOrEmpty(restricaoOR);
+			
 			String restricaoLike = this
-					.montaRestricaoLikecommandConsulta(commandConsultaVO);
+					.montaRestricaoLikeCommandConsulta(commandConsultaVO, adiciouClausula);
 			where.append(restricaoLike);
-
-			String restricaoMaiorMenor = this
-					.montaRestricaoMaiorMenorcommandConsulta(commandConsultaVO);
-			where.append(restricaoMaiorMenor);
-
+			
+			adiciouClausula = !SigmaDBUtil.isNullOrEmpty(restricaoLike);
+			
 			List<Ordenacao> orderBy = commandConsultaVO.getListaOrderBy();
 
-			if (!Util.isNullOrEmpty(orderBy)) {
+			if (!SigmaDBUtil.isNullOrEmpty(orderBy)) {
 				where.append(" order by ");
 				for (Ordenacao ordenacaoVO : orderBy) {
 					if (adicionaVirgula) {
@@ -750,35 +725,7 @@ public class SigmaDB {
 		}
 		return where.toString();
 	}
-
-	/**
-	 * Monta uma lista com as restriÁıes de perÌodo que est„o contidas no objeto
-	 * do par‚metro.
-	 * 
-	 * @param commandWhereVO
-	 *            Objeto que agrupa restriÁıes do tipo perÌodo.
-	 * @return Lista com as restriÁıes de perÌodo que est„o contidas no objeto
-	 *         do par‚metro.
-	 */
-	private List montaListaRestricaoPeriodos(CommandQuery commandWhereVO) {
-
-		List<Periodo> listaRestricoesPeriodo = new ArrayList<Periodo>();
-
-		Map<String, Periodo> mapaRestricaoPeriodos = commandWhereVO
-				.getMapaRestricoesPeriodo();
-
-		Set<String> campos = mapaRestricaoPeriodos.keySet();
-
-		for (String nomeColuna : campos) {
-
-			Periodo restricaoPeriodo = mapaRestricaoPeriodos.get(nomeColuna);
-
-			listaRestricoesPeriodo.add(restricaoPeriodo);
-		}
-
-		return listaRestricoesPeriodo;
-	}
-
+	
 	/**
 	 * Inclui na consulta as restrições OR contidas no objeto de command da
 	 * consulta.
@@ -786,29 +733,36 @@ public class SigmaDB {
 	 * @param command
 	 *            Objeto contendo a lista de restrição OR que deverá ser
 	 *            aplicada a consulta.
+	 * @param adicionouClasula True caso já exista uma clausula na consulta. False caso não exista nenhuma cláusula Where montada ainda.           
 	 * @return String contendo a restrição do tipo OR montada entre parênteses
 	 *         iniciada com um and. Ex. and (pess_id = 1 OR pess_id = 2 OR ...).
 	 *         Caso a lista de restrição OR esteja vazia o método retornará uma
 	 *         String em branco.
 	 */
-	private String montaRestricaoORcommandConsulta(CommandQuery command) {
+	private String montaRestricaoANDcommandConsulta(CommandQuery command, boolean adicionouClausula) {
 
-		String restricaoOR = "";
-		List<Filtro> listaRestricaoOR = command.getListaRestricaoOR();
+		StringBuffer restricao = new StringBuffer();
+		List<Filtro> listaRestricao= command.getListaRestricaoAND();
 
-		if (!Util.isNullOrEmpty(listaRestricaoOR)) {
-			restricaoOR += " and ";
-			restricaoOR += "(";
-			for (Filtro filtroVO : listaRestricaoOR) {
-				restricaoOR += filtroVO.getNomePropriedade() + " = "
-						+ filtroVO.getValorPropriedade() + " OR ";
+		String restricaoRetorno = "";
+		
+		if (!SigmaDBUtil.isNullOrEmpty(listaRestricao)) {
+			
+			if (adicionouClausula) {
+				restricao.append(" and ");
 			}
-			restricaoOR = restricaoOR.substring(0, restricaoOR.length() - 4);
-			restricaoOR += ") ";
+
+			for (Filtro filtro : listaRestricao) {
+				
+				restricao.append(filtro.getSQL() + " and ");
+			}
+			
+			restricaoRetorno = restricao.substring(0, restricao.length() - 5);
 		}
 
-		return restricaoOR;
+		return restricaoRetorno;		
 	}
+	
 
 	/**
 	 * Inclui na consulta as restrições OR contidas no objeto de command da
@@ -817,92 +771,35 @@ public class SigmaDB {
 	 * @param command
 	 *            Objeto contendo a lista de restrição OR que deverá ser
 	 *            aplicada a consulta.
+	 * @param adicionouClasula True caso já exista uma clausula na consulta. False caso não exista nenhuma cláusula Where montada ainda.
 	 * @return String contendo a restrição do tipo OR montada entre parênteses
-	 *         iniciada com um and. Ex. and (loag_documento is not null OR
-	 *         lote_documento is not null ...). Caso a lista de restrição OR
-	 *         esteja vazia o método retornará uma String em branco.
+	 *         iniciada com um and. Ex. and (pess_id = 1 OR pess_id = 2 OR ...).
+	 *         Caso a lista de restrição OR esteja vazia o método retornará uma
+	 *         String em branco.
 	 */
-	private String montaRestricaoNullcommandConsulta(CommandQuery command) {
+	private String montaRestricaoORcommandConsulta(CommandQuery command, boolean adicionouClausula) {
 
-		String restricaoNullQuery = "";
-		List<CommandNull> listaRestricaoNull = command.getListaRestricaoNull();
+		StringBuffer restricaoOR = new StringBuffer();
+		List<Filtro> listaRestricaoOR = command.getListaRestricaoOR();
 
-		if (!Util.isNullOrEmpty(listaRestricaoNull)) {
-			restricaoNullQuery += " and ";
-			restricaoNullQuery += "(";
-			for (CommandNull restricaoNull : listaRestricaoNull) {
-				restricaoNullQuery += restricaoNull.toString();
+		String restricaoRetorno = "";
+		
+		if (!SigmaDBUtil.isNullOrEmpty(listaRestricaoOR)) {
+			
+			if (adicionouClausula) {
+				restricaoOR.append(" and ");
 			}
-			restricaoNullQuery = restricaoNullQuery.substring(0,
-					restricaoNullQuery.length() - 4);
-			restricaoNullQuery += ") ";
+			
+			restricaoOR.append("(");
+			for (Filtro filtro : listaRestricaoOR) {
+				
+				restricaoOR.append(filtro.getSQL() + " OR ");
+			}
+			restricaoRetorno = restricaoOR.substring(0, restricaoOR.length() - 4);
+			restricaoRetorno += ") ";
 		}
 
-		return restricaoNullQuery;
-	}
-
-	/**
-	 * Inclui na consulta as restrições de diferença contidas no objeto de
-	 * command da consulta.
-	 * 
-	 * @param command
-	 *            Objeto contendo a lista de restrição OR que deverá ser
-	 *            aplicada a consulta.
-	 * @return String contendo a restrições de diferença montada um and. Ex. and
-	 *         pess_id <> 1 and pess_id <> 2 and ... Caso a lista de restrição
-	 *         de diferenças esteja vazia, o método retornará uma String em
-	 *         branco.
-	 */
-	private String montaRestricaoDiferencacommandConsulta(CommandQuery command) {
-
-		String restricaoOR = "";
-		List<Filtro> listaRestricaoDiferenca = command
-				.getListaRestricaoDiferenca();
-
-		if (!Util.isNullOrEmpty(listaRestricaoDiferenca)) {
-			restricaoOR += " and ";
-
-			for (Filtro filtroVO : listaRestricaoDiferenca) {
-				restricaoOR += filtroVO.getNomePropriedade() + " <> "
-						+ filtroVO.getValorPropriedade() + " and ";
-			}
-			restricaoOR = restricaoOR.substring(0, restricaoOR.length() - 5);
-
-		}
-
-		return restricaoOR;
-	}
-
-	/**
-	 * Inclui na consulta as restrições de igualdade contidas no objeto de
-	 * command da consulta.
-	 * 
-	 * @param command
-	 *            Objeto contendo a lista de restrição OR que deverá ser
-	 *            aplicada a consulta.
-	 * @return String contendo a restrições de igualdade montada um and. Ex. and
-	 *         pess_id = 1 and pess_id = 2 and ... Caso a lista de restrição de
-	 *         diferenças esteja vazia, o método retornará uma String em branco.
-	 */
-	private String montaRestricaoIgualdadecommandConsulta(CommandQuery command) {
-
-		String restricaoIgualdade = "";
-		List<Filtro> listaRestricaoIgualdade = command
-				.getListaRestricaoIgualdade();
-
-		if (!Util.isNullOrEmpty(listaRestricaoIgualdade)) {
-			restricaoIgualdade += " and ";
-
-			for (Filtro filtroVO : listaRestricaoIgualdade) {
-				restricaoIgualdade += filtroVO.getNomePropriedade() + " = "
-						+ filtroVO.getValorPropriedade() + " and ";
-			}
-			restricaoIgualdade = restricaoIgualdade.substring(0,
-					restricaoIgualdade.length() - 5);
-
-		}
-
-		return restricaoIgualdade;
+		return restricaoRetorno;
 	}
 
 	/**
@@ -912,59 +809,34 @@ public class SigmaDB {
 	 * @param command
 	 *            Objeto contendo a lista de restrição LIKE que deverá ser
 	 *            aplicada a consulta.
+	 * @param adicionouClasula True caso já exista uma clausula na consulta. False caso não exista nenhuma cláusula Where montada ainda.
 	 * @return String contendo a restrições de LIKE montada um and. Ex. and
 	 *         pess_nome LIKE 'T1' and pess_nome LIKE 'T2'and ... Caso a lista
 	 *         de restrição de LIKE esteja vazia, o método retornará uma String
 	 *         em branco.
 	 */
-	private String montaRestricaoLikecommandConsulta(CommandQuery command) {
-		String restricaoLike = "";
-		List<Filtro> listaRestricaoLike = command.getListaRestricaoLike();
+	private String montaRestricaoLikeCommandConsulta(CommandQuery command, boolean adicionouClausula) {
+		StringBuffer restricaoLike = new StringBuffer();
+		List<BeanFilter> listaRestricaoLike = command.getListaRestricaoLike();
 
-		if (!Util.isNullOrEmpty(listaRestricaoLike)) {
-			restricaoLike += " and ";
-
-			for (Filtro filtroVO : listaRestricaoLike) {
-				restricaoLike += filtroVO.getNomePropriedade() + " like "
-						+ filtroVO.getValorPropriedade() + " and ";
+		String restricaoRetorno = "";
+		
+		if (!SigmaDBUtil.isNullOrEmpty(listaRestricaoLike)) {
+			
+			if (adicionouClausula) {
+				restricaoLike.append(" and ");
 			}
-			restricaoLike = restricaoLike.substring(0,
+			
+			for (BeanFilter filtroVO : listaRestricaoLike) {
+				restricaoLike.append(filtroVO.getNomePropriedade() + " like "
+						+ filtroVO.getValorPropriedade() + " and ");
+			}
+			restricaoRetorno = restricaoLike.substring(0,
 					restricaoLike.length() - 5);
 
 		}
 
-		return restricaoLike;
-	}
-
-	/**
-	 * Inclui na consulta as restrições de Menor Que/Maior Que/Maior Igual/Menor
-	 * Igual contidas no objeto de command da consulta.
-	 * 
-	 * @param command
-	 *            Objeto contendo a lista de restrição que deverá ser aplicada a
-	 *            consulta.
-	 * @return String contendo as restrições montada em and. Ex. and a < 2 and p
-	 *         > 0 ... Caso a lista esteja vazia, o método retornará uma String
-	 *         em branco.
-	 */
-	private String montaRestricaoMaiorMenorcommandConsulta(CommandQuery command) {
-		String restricaoMaiorMenor = "";
-		List<RestricaoMaiorMenor> listaRestricaoMaiorMenor = command
-				.getListaRestricaoMaiorMenor();
-
-		if (!Util.isNullOrEmpty(listaRestricaoMaiorMenor)) {
-			restricaoMaiorMenor += " and ";
-
-			for (RestricaoMaiorMenor restricaoMaiorMenorVO : listaRestricaoMaiorMenor) {
-				restricaoMaiorMenor += restricaoMaiorMenorVO.toString()
-						+ " and ";
-			}
-			restricaoMaiorMenor = restricaoMaiorMenor.substring(0,
-					restricaoMaiorMenor.length() - 5);
-
-		}
-
-		return restricaoMaiorMenor;
-	}
+		return restricaoRetorno;
+	}	
 
 }

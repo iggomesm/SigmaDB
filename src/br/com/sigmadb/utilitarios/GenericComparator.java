@@ -28,7 +28,7 @@ public class GenericComparator<T extends Object> implements Comparator<T> {
 	 */
 	public GenericComparator(String sortField, EnumSortType sortType) {
 		this.sortType = sortType;
-		this.methodName = ReflectionUtil.buildGetMethodName(sortField);
+		this.methodName = SigmaDBReflectionUtil.buildGetMethodName(sortField);
 	}
 
 	public int compare(T o1, T o2) {

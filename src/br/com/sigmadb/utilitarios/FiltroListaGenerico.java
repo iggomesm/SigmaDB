@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import br.com.sigmadb.beans.utilitarios.Filtro;
+import br.com.sigmadb.beans.utilitarios.BeanFilter;
 import br.com.sigmadb.enumerations.EnumSortType;
 import br.com.sigmadb.exceptions.SigmaDBException;
 
@@ -20,21 +20,21 @@ import br.com.sigmadb.exceptions.SigmaDBException;
  */
 public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 
-	private List<Filtro> listaFiltroVO;
-	private Filtro filtroVO;
+	private List<BeanFilter> listaFiltroVO;
+	private BeanFilter filtroVO;
 
-	public FiltroListaGenerico(List<Filtro> listaFiltroVO) {
+	public FiltroListaGenerico(List<BeanFilter> listaFiltroVO) {
 		this.listaFiltroVO = listaFiltroVO;
 	}
 
-	public FiltroListaGenerico(Filtro filtroVO) {
+	public FiltroListaGenerico(BeanFilter filtroVO) {
 		this.filtroVO = filtroVO;
 	}
 
 	public boolean corresponde(T elementoCandidato) throws Exception {
 		boolean deveFiltrar = false;
 
-		if (!Util.isNullOrEmpty(listaFiltroVO)) {
+		if (!SigmaDBUtil.isNullOrEmpty(listaFiltroVO)) {
 
 			deveFiltrar = this
 					.verificaSeDeveFiltrarListaFiltroVO(elementoCandidato);
@@ -70,7 +70,7 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 		for (Iterator listaFiltroIterator = listaFiltroVO.iterator(); listaFiltroIterator
 				.hasNext();) {
 
-			Filtro filtro = (Filtro) listaFiltroIterator.next();
+			BeanFilter filtro = (BeanFilter) listaFiltroIterator.next();
 
 			boolean ehCampoData = this.verificaCampoTipoData(elementoCandidato,
 					filtro);
@@ -78,7 +78,7 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 			String valor = null;
 
 			if (ehCampoData) {
-				java.sql.Timestamp data = (java.sql.Timestamp) ReflectionUtil
+				java.sql.Timestamp data = (java.sql.Timestamp) SigmaDBReflectionUtil
 						.getValorMetodoGet(elementoCandidato,
 								filtro.getNomePropriedade());
 
@@ -88,7 +88,7 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 					valor = new Day(data).toString();
 				}
 			} else {
-				valor = String.valueOf(ReflectionUtil.getValorMetodoGet(
+				valor = String.valueOf(SigmaDBReflectionUtil.getValorMetodoGet(
 						elementoCandidato, filtro.getNomePropriedade()));
 
 			}
@@ -121,13 +121,13 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 
 		boolean possuiUnicaPropriedade = true;
 
-		if (!Util.isNullOrEmpty(listaFiltroVO)) {
-			String nomeUltimaPropriedade = (String) ((Filtro) Util
+		if (!SigmaDBUtil.isNullOrEmpty(listaFiltroVO)) {
+			String nomeUltimaPropriedade = (String) ((BeanFilter) SigmaDBUtil
 					.getFirst(listaFiltroVO)).getNomePropriedade();
 
 			for (Iterator listaFiltroIterator = listaFiltroVO.iterator(); listaFiltroIterator
 					.hasNext();) {
-				Filtro filtro = (Filtro) listaFiltroIterator.next();
+				BeanFilter filtro = (BeanFilter) listaFiltroIterator.next();
 
 				possuiUnicaPropriedade = nomeUltimaPropriedade.equals(filtro
 						.getNomePropriedade());
@@ -159,7 +159,7 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 		String valor = null;
 
 		if (ehCampoData) {
-			java.sql.Timestamp data = (java.sql.Timestamp) ReflectionUtil
+			java.sql.Timestamp data = (java.sql.Timestamp) SigmaDBReflectionUtil
 					.getValorMetodoGet(elementoCandidato,
 							filtroVO.getNomePropriedade());
 
@@ -170,7 +170,7 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 			}
 
 		} else {
-			valor = String.valueOf(ReflectionUtil.getValorMetodoGet(
+			valor = String.valueOf(SigmaDBReflectionUtil.getValorMetodoGet(
 					elementoCandidato, filtroVO.getNomePropriedade()));
 
 		}
@@ -187,10 +187,10 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 	 * @return Boleano indicando se o campo solicitado como filtro é uma data.
 	 * @throws Exception
 	 */
-	private boolean verificaCampoTipoData(T elementoCandidato, Filtro filtro)
+	private boolean verificaCampoTipoData(T elementoCandidato, BeanFilter filtro)
 			throws Exception {
 
-		Method retorno = ReflectionUtil.getMetodoGetNaClasse(
+		Method retorno = SigmaDBReflectionUtil.getMetodoGetNaClasse(
 				elementoCandidato.getClass(), filtro.getNomePropriedade());
 
 		if (retorno == null) {
@@ -200,7 +200,7 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 
 		String nomeMetodo = retorno.getName();
 
-		Class tipo = ReflectionUtil.pegaTipoDoMetodoGet(elementoCandidato,
+		Class tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(elementoCandidato,
 				nomeMetodo);
 
 		return tipo == java.sql.Timestamp.class;
@@ -218,8 +218,8 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 	 */
 	public void ordenaFiltros(Object obj) throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
-		if (!Util.isNullOrEmpty(listaFiltroVO)) {
-			Filtro filtro = (Filtro) Util.getFirst(listaFiltroVO);
+		if (!SigmaDBUtil.isNullOrEmpty(listaFiltroVO)) {
+			BeanFilter filtro = (BeanFilter) SigmaDBUtil.getFirst(listaFiltroVO);
 			ordenarPelaPropriedade(filtro, obj);
 		}
 	}
@@ -236,12 +236,12 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 	 * @throws IllegalAccessException
 	 * @throws InvocationTargetException
 	 */
-	private void ordenarPelaPropriedade(Filtro filtro, Object obj)
+	private void ordenarPelaPropriedade(BeanFilter filtro, Object obj)
 			throws IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
 
-		Class tipo = ReflectionUtil.pegaTipoDoMetodoGet(obj,
-				ReflectionUtil.getNomeMetodoGet(filtro.getNomePropriedade()));
+		Class tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(obj,
+				SigmaDBReflectionUtil.getNomeMetodoGet(filtro.getNomePropriedade()));
 
 		if (tipo.getName().equalsIgnoreCase(Integer.class.getName())
 				|| tipo.getName().equalsIgnoreCase("int")) {
@@ -253,7 +253,7 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 
 			ordenaListaDouble(filtro.getNomePropriedade());
 		} else {
-			Util.ordenaLista(listaFiltroVO, "valorPropriedade",
+			SigmaDBUtil.ordenaLista(listaFiltroVO, "valorPropriedade",
 					EnumSortType.ASC);
 		}
 	}
@@ -268,7 +268,7 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 	public void ordenaListaDouble(String nomePropriedade) {
 		List<Double> listaDouble = new ArrayList<Double>();
 		for (Iterator iterator = listaFiltroVO.iterator(); iterator.hasNext();) {
-			Filtro filtro = (Filtro) iterator.next();
+			BeanFilter filtro = (BeanFilter) iterator.next();
 			listaDouble.add(Double.parseDouble(filtro.getValorPropriedade()));
 		}
 
@@ -277,7 +277,7 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 		listaFiltroVO.clear();
 		for (Iterator iterator = listaDouble.iterator(); iterator.hasNext();) {
 			Double doubleValor = (Double) iterator.next();
-			listaFiltroVO.add(new Filtro(nomePropriedade, String
+			listaFiltroVO.add(new BeanFilter(nomePropriedade, String
 					.valueOf(doubleValor)));
 		}
 	}
@@ -287,13 +287,13 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 	 * listaFiltroVO e criando novamente com a ordenação correta.
 	 * 
 	 * @param nomePropriedade
-	 *            propriedade a ser usada no {@link Filtro} para recriação da
+	 *            propriedade a ser usada no {@link BeanFilter} para recriação da
 	 *            listaFiltroVO
 	 */
 	public void ordenaListaInteger(String nomePropriedade) {
 		List<Integer> listaInteger = new ArrayList<Integer>();
 		for (Iterator iterator = listaFiltroVO.iterator(); iterator.hasNext();) {
-			Filtro filtro = (Filtro) iterator.next();
+			BeanFilter filtro = (BeanFilter) iterator.next();
 			listaInteger.add(Integer.parseInt(filtro.getValorPropriedade()));
 		}
 
@@ -303,7 +303,7 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 
 		for (Iterator iterator = listaInteger.iterator(); iterator.hasNext();) {
 			Integer inteiroValor = (Integer) iterator.next();
-			listaFiltroVO.add(new Filtro(nomePropriedade, String
+			listaFiltroVO.add(new BeanFilter(nomePropriedade, String
 					.valueOf(inteiroValor)));
 		}
 	}
@@ -327,14 +327,14 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 
 		Class tipo = null;
 
-		if (!Util.isNullOrEmpty(listaFiltroVO)) {
-			Filtro filtro = (Filtro) Util.getLast(listaFiltroVO);
-			tipo = ReflectionUtil
-					.pegaTipoDoMetodoGet(elementoCandidato, ReflectionUtil
+		if (!SigmaDBUtil.isNullOrEmpty(listaFiltroVO)) {
+			BeanFilter filtro = (BeanFilter) SigmaDBUtil.getLast(listaFiltroVO);
+			tipo = SigmaDBReflectionUtil
+					.pegaTipoDoMetodoGet(elementoCandidato, SigmaDBReflectionUtil
 							.getNomeMetodoGet(filtro.getNomePropriedade()));
 		} else {
-			tipo = ReflectionUtil.pegaTipoDoMetodoGet(elementoCandidato,
-					ReflectionUtil.getNomeMetodoGet(filtroVO
+			tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(elementoCandidato,
+					SigmaDBReflectionUtil.getNomeMetodoGet(filtroVO
 							.getNomePropriedade()));
 		}
 
@@ -364,7 +364,7 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 	 * @return true caso exista lista filtro. false caso contrario.
 	 */
 	public boolean existListaFiltro() {
-		return !Util.isNullOrEmpty(listaFiltroVO);
+		return !SigmaDBUtil.isNullOrEmpty(listaFiltroVO);
 	}
 
 	/**
@@ -381,14 +381,14 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 
 		boolean continuaFiltrando;
 
-		Filtro filtro = Util.isNullOrEmpty(listaFiltroVO) ? filtroVO
-				: (Filtro) Util.getLast(listaFiltroVO);
+		BeanFilter filtro = SigmaDBUtil.isNullOrEmpty(listaFiltroVO) ? filtroVO
+				: (BeanFilter) SigmaDBUtil.getLast(listaFiltroVO);
 
 		try {
 			int valorUltimoFiltro = Integer.parseInt(filtro
 					.getValorPropriedade());
 
-			String valorAtributo = String.valueOf(ReflectionUtil
+			String valorAtributo = String.valueOf(SigmaDBReflectionUtil
 					.getValorMetodoGet(elementoCandidato,
 							filtro.getNomePropriedade()));
 
@@ -416,14 +416,14 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 
 		boolean continuaFiltrando;
 
-		Filtro filtro = Util.isNullOrEmpty(listaFiltroVO) ? filtroVO
-				: (Filtro) Util.getLast(listaFiltroVO);
+		BeanFilter filtro = SigmaDBUtil.isNullOrEmpty(listaFiltroVO) ? filtroVO
+				: (BeanFilter) SigmaDBUtil.getLast(listaFiltroVO);
 
 		try {
 			double valorUltimoFiltro = Double.parseDouble(filtro
 					.getValorPropriedade());
 
-			String valorAtributo = String.valueOf(ReflectionUtil
+			String valorAtributo = String.valueOf(SigmaDBReflectionUtil
 					.getValorMetodoGet(elementoCandidato,
 							filtro.getNomePropriedade()));
 
@@ -451,14 +451,14 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 
 		boolean continuaFiltrando;
 
-		Filtro filtro = Util.isNullOrEmpty(listaFiltroVO) ? filtroVO
-				: (Filtro) Util.getLast(listaFiltroVO);
+		BeanFilter filtro = SigmaDBUtil.isNullOrEmpty(listaFiltroVO) ? filtroVO
+				: (BeanFilter) SigmaDBUtil.getLast(listaFiltroVO);
 
 		try {
 
 			Day valorUltimoFiltro = new Day(filtro.getValorPropriedade());
 
-			java.sql.Timestamp dataAtributo = (java.sql.Timestamp) ReflectionUtil
+			java.sql.Timestamp dataAtributo = (java.sql.Timestamp) SigmaDBReflectionUtil
 					.getValorMetodoGet(elementoCandidato,
 							filtro.getNomePropriedade());
 
@@ -486,13 +486,13 @@ public class FiltroListaGenerico<T extends Object> implements FiltroLista<T> {
 
 		boolean continuaFiltrando;
 
-		Filtro filtro = Util.isNullOrEmpty(listaFiltroVO) ? filtroVO
-				: (Filtro) Util.getLast(listaFiltroVO);
+		BeanFilter filtro = SigmaDBUtil.isNullOrEmpty(listaFiltroVO) ? filtroVO
+				: (BeanFilter) SigmaDBUtil.getLast(listaFiltroVO);
 		try {
 
 			String valorUltimoFiltro = filtro.getValorPropriedade();
 
-			String valorCandidato = String.valueOf(ReflectionUtil
+			String valorCandidato = String.valueOf(SigmaDBReflectionUtil
 					.getValorMetodoGet(elementoCandidato,
 							filtro.getNomePropriedade()));
 

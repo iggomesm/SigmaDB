@@ -75,7 +75,7 @@ public class ConnectionLog {
 				throw new SigmaDBException("Não é possível criar conexão sem um usuário válido.");
 			}
 
-			if (Util.isNullOrEmpty(origem)){
+			if (SigmaDBUtil.isNullOrEmpty(origem)){
 				throw new SigmaDBException("Não é possível criar conexão sem que seja informado um local que originou a solicitação de abertura de conexão.");
 			}
 

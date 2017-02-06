@@ -11,13 +11,12 @@ import java.util.List;
 import org.apache.commons.lang.WordUtils;
 
 import br.com.sigmadb.annotations.PKTableMaster;
-import br.com.sigmadb.annotations.RemoveAtributoConsulta;
 
 /**
  * Classe utilitária para reflexão.
  * 
  */
-public class ReflectionUtil {
+public class SigmaDBReflectionUtil {
 
 	/**
 	 * Prefixo <code>get</code> métodos
@@ -226,7 +225,7 @@ public class ReflectionUtil {
 			throws IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
 		Object valor = null;
-		if (objeto != null && !Util.isNullOrEmpty(nomeMetodo)) {
+		if (objeto != null && !SigmaDBUtil.isNullOrEmpty(nomeMetodo)) {
 			Class<?> classe = objeto.getClass();
 			Method[] declaredMethods = classe.getMethods();
 			for (Method method : declaredMethods) {
@@ -257,7 +256,7 @@ public class ReflectionUtil {
 			throws IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
 		Class tipo = null;
-		if (objeto != null && !Util.isNullOrEmpty(nomeMetodo)) {
+		if (objeto != null && !SigmaDBUtil.isNullOrEmpty(nomeMetodo)) {
 			Class<?> classe = objeto.getClass();
 			Method[] declaredMethods = classe.getMethods();
 			for (Method method : declaredMethods) {
@@ -295,7 +294,7 @@ public class ReflectionUtil {
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
-		if (objeto != null && !Util.isNullOrEmpty(nomePropriedade)) {
+		if (objeto != null && !SigmaDBUtil.isNullOrEmpty(nomePropriedade)) {
 			Class<?> classe = objeto.getClass();
 			Method metodo = getMetodoNaClasse(classe, nomePropriedade,
 					PREFIXO_METODO_SET);
@@ -325,7 +324,7 @@ public class ReflectionUtil {
 			Object valor, Class tipo) throws SecurityException,
 			NoSuchMethodException, IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
-		if (objeto != null && !Util.isNullOrEmpty(nomeMetodo)) {
+		if (objeto != null && !SigmaDBUtil.isNullOrEmpty(nomeMetodo)) {
 			Class<?> classe = objeto.getClass();
 			Method metodo = classe.getMethod(nomeMetodo, tipo);
 			if (metodo != null) {
@@ -516,7 +515,7 @@ public class ReflectionUtil {
 			throws SecurityException, NoSuchMethodException,
 			IllegalArgumentException, IllegalAccessException,
 			InvocationTargetException {
-		if (objeto != null && !Util.isNullOrEmpty(nomeMetodo)) {
+		if (objeto != null && !SigmaDBUtil.isNullOrEmpty(nomeMetodo)) {
 			Class<?> classe = objeto.getClass();
 			Method metodo = classe.getMethod(nomeMetodo);
 			if (metodo != null) {
@@ -546,7 +545,7 @@ public class ReflectionUtil {
 			InvocationTargetException {
 		Object retorno = null;
 
-		if (objeto != null && !Util.isNullOrEmpty(nomeMetodo)) {
+		if (objeto != null && !SigmaDBUtil.isNullOrEmpty(nomeMetodo)) {
 			Class<?> classe = objeto.getClass();
 			Method metodo = classe.getMethod(nomeMetodo);
 			if (metodo != null) {
