@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Estrutura de configuração SigmaDB</comment>
+<entry key="userName">postgres</entry>
+<entry key="password">root</entry>
+<entry key="url">jdbc:postgresql://localhost:5432/MyClients</entry>
+<entry key="driver">org.postgresql.Driver</entry>
+<entry key="printSqlConsole">true</entry>
+<entry key="useIlog">false</entry>
+</properties>

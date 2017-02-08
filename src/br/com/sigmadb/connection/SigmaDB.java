@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,8 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.PropertyUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import br.com.sigmadb.beans.utilitarios.BeanFilter;
@@ -483,6 +482,10 @@ public class SigmaDB {
 					
 					Class tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(bean, SigmaDBReflectionUtil.getNomeMetodoGet(propriedadeNome));
 					
+					if (tipo == null) {
+						tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(bean, SigmaDBReflectionUtil.getNomeMetodoIs(propriedadeNome));
+					}
+					
 					Object valor = extraiValorResultSet(resultSet, tipo, propriedadeNome);
 					
 					propriedades.put(propriedadeNome, valor);
@@ -498,6 +501,10 @@ public class SigmaDB {
 				Object valor = entry.getValue();
 				
 				Class tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(instancia, SigmaDBReflectionUtil.getNomeMetodoGet(nome));
+				
+				if (tipo == null) {
+					tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(bean, SigmaDBReflectionUtil.getNomeMetodoIs(nome));
+				}
 				
 				if (valor == null || valor.equals("0") || valor.equals("null")){
 					
@@ -609,29 +616,66 @@ public class SigmaDB {
 		
 		Class tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(bean, SigmaDBReflectionUtil.getNomeMetodoGet(nomeAtributo));
 		
-		if ((int.class.equals(tipo) || Integer.class.equals(tipo))
-				&& "0".equals(propriedades.get(nomeAtributo))) {
-			return false;
+		if (tipo == null) {
+			tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(bean, SigmaDBReflectionUtil.getNomeMetodoIs(nomeAtributo));
 		}
-
-		if ((double.class.equals(tipo) || Double.class.equals(tipo))
-				&& "0.0".equals(propriedades.get(nomeAtributo))) {
-			return false;
-		}
-
+		
+		
 		if (String.class.equals(tipo)
 				&& ("".equals(propriedades.get(nomeAtributo)) || "null"
 						.equalsIgnoreCase(String.valueOf(propriedades
 								.get(nomeAtributo))))) {
 			return false;
 		}
+		
+		if ((int.class.equals(tipo) || Integer.class.equals(tipo))
+				&& ("0".equals(propriedades.get(nomeAtributo)) || "null".equals(propriedades.get(nomeAtributo)))) {
+			return false;
+		}
 
+		if ((double.class.equals(tipo) || Double.class.equals(tipo))
+				&& ("0.0".equals(propriedades.get(nomeAtributo)) || "null".equals(propriedades.get(nomeAtributo)))) {
+			return false;
+		}
+		
 		if ((long.class.equals(tipo) || Long.class.equals(tipo))
-				&& "0".equals(propriedades.get(nomeAtributo))) {
+				&& ("0".equals(propriedades.get(nomeAtributo)) || "null".equals(propriedades.get(nomeAtributo)))) {
+			return false;
+		}
+		
+		if ((float.class.equals(tipo) || Float.class.equals(tipo))
+				&& ("0.0".equals(propriedades.get(nomeAtributo)) || "null".equals(propriedades.get(nomeAtributo)))) {
+			return false;
+		}
+		
+		if ((short.class.equals(tipo) || Short.class.equals(tipo))
+				&& ("0".equals(propriedades.get(nomeAtributo)) || "null".equals(propriedades.get(nomeAtributo)))) {
+			return false;
+		}
+		
+		if ((byte.class.equals(tipo) || Byte.class.equals(tipo))
+				&& ("0".equals(propriedades.get(nomeAtributo)) || "null".equals(propriedades.get(nomeAtributo)))) {
+			return false;
+		}
+		
+		if (Boolean.class.equals(tipo)
+				&& "null".equals(propriedades.get(nomeAtributo))) {
 			return false;
 		}
 
 		if (Timestamp.class.equals(tipo)
+				&& "null".equalsIgnoreCase(String.valueOf(propriedades
+						.get(nomeAtributo)))) {
+			return false;
+		}
+		
+		if (Date.class.equals(tipo)
+				&& "null".equalsIgnoreCase(String.valueOf(propriedades
+						.get(nomeAtributo)))) {
+			return false;
+		}
+		
+		if (Time.class.equals(tipo)
 				&& "null".equalsIgnoreCase(String.valueOf(propriedades
 						.get(nomeAtributo)))) {
 			return false;

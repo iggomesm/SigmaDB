@@ -441,6 +441,25 @@ public class SigmaDBReflectionUtil {
 
 		return PREFIXO_METODO_GET + WordUtils.capitalize(nomePropriedade);
 	}
+	
+	/**
+	 * Retorna o nome do método <code><b>get</b></code> de uma propriedade.
+	 * 
+	 * 
+	 * @param nomePropriedade
+	 *            Nome da propriedade ({@link Field}) para que seja retornado o
+	 *            método get.
+	 *            <p>
+	 *            <b>Exemplo</b>:
+	 *            <code><p> se o nomePropriedade for "pergunta" então o código vai retornar
+	 *             o nome do método get, no caso, getPergunta.
+	 * 
+	 * @return Retorna uma {@link String} com o nome do método.
+	 */
+	public static String getNomeMetodoIs(final String nomePropriedade) {
+
+		return PREFIXO_METODO_GET_BOLEANO + WordUtils.capitalize(nomePropriedade);
+	}
 
 	/**
 	 * Retorna o valor do campo {@link Field} da classe representada pelo Objeto
@@ -574,7 +593,14 @@ public class SigmaDBReflectionUtil {
 
 			for (String metodo : nomeMetodos) {
 				if (!metodo.equals("getClass")) {
-					nomes.add(metodo.replaceAll("get", "").toLowerCase());
+					String atributo = "";
+					if (metodo.startsWith(PREFIXO_METODO_GET)) {
+						atributo = metodo.replaceFirst("get", "").toLowerCase();
+					} else if (metodo.startsWith(PREFIXO_METODO_GET_BOLEANO)) {
+						atributo = metodo.replaceFirst("is", "").toLowerCase();
+					}
+					
+					nomes.add(atributo);
 				}
 			}
 		}

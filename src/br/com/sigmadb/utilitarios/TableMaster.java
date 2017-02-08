@@ -244,23 +244,29 @@ public abstract class TableMaster {
 
 			Class tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(objeto,
 					nomeMetodoGet);
+			
+			if (tipo == null) {
+				nomeMetodoGet = SigmaDBReflectionUtil.getNomeMetodoIs(nomeAtributo);
+				tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(objeto,
+						nomeMetodoGet);
+			}
+			
 
-			boolean ehNumerico = tipo.getName().equalsIgnoreCase(
-					Double.class.getName())
-					|| tipo.getName().equalsIgnoreCase(Float.class.getName())
-					|| tipo.getName().equalsIgnoreCase(Integer.class.getName())
-					|| tipo.getName().equalsIgnoreCase(Long.class.getName())
-					|| tipo.getName().equalsIgnoreCase(Byte.class.getName())
-					|| tipo.getName().equalsIgnoreCase(int.class.getName())
-					|| tipo.getName().equalsIgnoreCase(double.class.getName())
-					|| tipo.getName().equalsIgnoreCase(long.class.getName())
-					|| tipo.getName().equalsIgnoreCase(byte.class.getName())
-					|| tipo.getName().equalsIgnoreCase(float.class.getName());
+			boolean ehNumerico = tipo.equals(Double.class)
+					|| tipo.equals(Float.class)
+					|| tipo.equals(Integer.class)
+					|| tipo.equals(Long.class)
+					|| tipo.equals(Byte.class)
+					|| tipo.equals(int.class)
+					|| tipo.equals(double.class)
+					|| tipo.equals(long.class)
+					|| tipo.equals(byte.class)
+					|| tipo.equals(float.class);
 
-			boolean aplicaAspasSimples = tipo.getName().equalsIgnoreCase(
-					String.class.getName())
-					|| tipo.getName().equalsIgnoreCase(
-							java.sql.Timestamp.class.getName());
+			boolean aplicaAspasSimples = tipo.equals(String.class) || 
+										 tipo.equals(java.sql.Timestamp.class) ||
+										 tipo.equals(java.sql.Date.class)||
+										 tipo.equals(java.sql.Time.class);
 
 			Object valor = SigmaDBReflectionUtil.pegaValorDoMetodoGet(objeto,
 					nomeMetodoGet);
@@ -274,16 +280,12 @@ public abstract class TableMaster {
 
 					retorno = String.valueOf(valor);
 
-				} else if (tipo.getName().equalsIgnoreCase(
-						java.sql.Date.class.getName())) {
+				} else if (tipo.equals(boolean.class) || tipo.equals(Boolean.class)) {
 
-					retorno = valor.toString();
+					retorno =String.valueOf(valor);
 
-				} else if (tipo.getName().equalsIgnoreCase(
-						java.sql.Time.class.getName())) {
-
-					retorno = valor.toString();
-				}
+				} 
+				
 			} else {
 				retorno = "NULL";
 			}
