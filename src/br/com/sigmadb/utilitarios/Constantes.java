@@ -1,7 +1,7 @@
 package br.com.sigmadb.utilitarios;
 
 public class Constantes {
-    public static final String CONFIG = "SigmaProperties";
+    public static final String CONFIG = "SigmaDBProperties";
     public static final String DATA_FORMATO = "dd/MM/yyyy";
     public static final String DATA_MMYYYY = "MMyyyy";
     public static final String DATA_FORMATO_MMYYYY = "MM/yyyy";

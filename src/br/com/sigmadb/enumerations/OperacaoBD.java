@@ -1,11 +1,11 @@
 package br.com.sigmadb.enumerations;
 
-public enum EnumOperacaoBD {	
+public enum OperacaoBD {	
 	INSERT("I"), UPDATE("U"), DELETE("D");
 	
 	private String value;
 	
-	private EnumOperacaoBD(String value){
+	private OperacaoBD(String value){
 		this.value = value;
 	}
 

@@ -35,6 +35,8 @@ public class CommandQuery {
 	
 	private String[] atributosExclusaoConsulta;
 	
+	private List<String> listaColunasRetorno;
+	
 	public CommandQuery(){
 		this.inicializaPropriedades(null);
 	}
@@ -51,6 +53,7 @@ public class CommandQuery {
 		this.atributosExclusaoConsulta = new String[0];
 		this.listaRestricaoJoin = new ArrayList<String>();
 		this.listaRestricaoLike = new ArrayList<BeanFilter>();
+		this.listaColunasRetorno = new ArrayList<String>();
 	}
 	
 	/**
@@ -361,6 +364,34 @@ public class CommandQuery {
 	}
 	
 	/**
+	 * Adiciona as colunas que deverão ser retornadas na consulta.
+	 * @param coluna Nome da coluna da tabela que deverá ser retornada na consulta.
+	 * @throws SigmaDBException 
+	 */
+	public void addColunaRetorno(String coluna) throws SigmaDBException {
+		this.addColunaRetorno(coluna, null);
+	}
+	
+	/**
+	 * Adiciona as colunas que deverão ser retornadas na consulta.
+	 * @param coluna Nome da coluna da tabela que deverá ser retornada na consulta.
+	 * @param alias Aplica um alias para a coluna que serrá retornada. Ex. colunas as alias
+	 * @throws SigmaDBException 
+	 */
+	public void addColunaRetorno(String coluna, String alias) throws SigmaDBException {
+		
+		if (SigmaDBUtil.isNullOrEmpty(coluna)) {
+			throw new SigmaDBException("Não é permitido inserir colunas vazias ou nulas para retorno da consulta.");
+		}
+		
+		if (!SigmaDBUtil.isNullOrEmpty(alias)) {
+			coluna = coluna + " as " + alias;
+		}
+		
+		this.listaColunasRetorno.add(coluna);
+	}
+	
+	/**
 	 * Devolve o nome da tabela para qual este objeto irá apontar na consulta como a tabela "FROM". 
 	 * @return String contendo o nome de uma tabela do banco de dados.
 	 */
@@ -391,6 +422,8 @@ public class CommandQuery {
 	public List<ComandoSqlIN> getListaCommandSqlIN() {
 		return listaCommandSqlIN;
 	}
-	
-	
+
+	public List<String> getListaColunasRetorno() {
+		return listaColunasRetorno;
+	}
 }

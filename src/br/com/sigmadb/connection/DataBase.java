@@ -24,11 +24,12 @@ import br.com.sigmadb.utilitarios.Constantes;
 public class DataBase {
 
 	//private final String PROPERTIES_FILE = "main" + File.separator + "resources" + File.separator + "configuracoes.properties";
-	private final String PROPERTIES_FILE = Constantes.CONFIG + ".properties";
+	private final String PROPERTIES_FILE = Constantes.CONFIG + ".xml";
 	private String url;
     private String driver;
     private String usuario;
     private String senha;
+    private static String useIlog;
     private static String printSql;
     private static DataBase instance = null;
     public static final int ACTION_ALTEROU_VALORES = 1;
@@ -42,7 +43,7 @@ public class DataBase {
 
     /**
      * Executa qualquer consulta sql.
-     * @param sql Consulta sql que ser� executada.
+     * @param sql Consulta sql que será executada.
      * @return ResultSet obtido pela consulta.
      * @throws ClassNotFoundException
      * @throws SQLException
@@ -97,7 +98,7 @@ public class DataBase {
     }
 
     /**
-     * Realiza o commit da conx�o aberta.
+     * Realiza o commit da conexão aberta.
      * @throws ClassNotFoundException
      * @throws SQLException
      */
@@ -111,7 +112,7 @@ public class DataBase {
     }
     
     /**
-     * Realiza o rollBack da conex�o aberta.
+     * Realiza o rollBack da conexão aberta.
      * @throws SQLException
      */
     public static void rollBack(Connection connection) throws SQLException{
@@ -136,15 +137,16 @@ public class DataBase {
 		
 		try {
 			if (inputStream != null) {
-				properties.load(inputStream);
+				properties.loadFromXML(inputStream);
 			} else {
-				throw new FileNotFoundException("property file '" + PROPERTIES_FILE + "' not found in the classpath");
+				throw new FileNotFoundException("Arquivo '" + PROPERTIES_FILE + "' não encontrado no classpath.");
 			}
 			url = properties.getProperty("url");
 			usuario = properties.getProperty("userName");
 			senha = properties.getProperty("password");
 			driver = properties.getProperty("driver");
-			printSql = properties.getProperty("printSql");
+			printSql = properties.getProperty("printSqlConsole");
+			useIlog  = properties.getProperty("useIlog");
 		}catch (IOException e) {
 			System.out.println("Exception: " + e);
 		}finally {
@@ -165,8 +167,8 @@ public class DataBase {
     }
 
     /**
-     * Cria uma conex�o com o banco.
-     * @return Objeto de conex�o aberta com o banco.
+     * Cria uma conexão com o banco.
+     * @return Objeto de conexão aberta com o banco.
      * @throws ClassNotFoundException
      * @throws SQLException
      */
@@ -222,5 +224,9 @@ public class DataBase {
 		}
 		
 		return versao;
-	}	
+	}
+
+	public static String getUseIlog() {
+		return useIlog;
+	}
 }

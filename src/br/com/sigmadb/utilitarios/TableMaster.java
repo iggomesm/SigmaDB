@@ -175,13 +175,13 @@ public abstract class TableMaster {
 	}
 
 	/**
-	 * Monta a restri��o para updates e deletes baseado nas PK selecioandas para
+	 * Monta a restrição para updates e deletes baseado nas PK selecioandas para
 	 * o objeto.
 	 * 
 	 * @param objeto
 	 *            Objeto que contenha uma {@link PKTableMaster} indicando uma ou
 	 *            mais PrimaryKeys.
-	 * @return Cl�usula where montada.
+	 * @return Cláusula where montada.
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 * @throws InvocationTargetException
@@ -217,14 +217,14 @@ public abstract class TableMaster {
 	}
 
 	/**
-	 * Formata uma string que representa o valor de um atributo que dever� ser
+	 * Formata uma string que representa o valor de um atributo que deverá ser
 	 * persistido no banco de Dados.
 	 * 
 	 * @param objeto
-	 *            Objeto que cont�m os valores que ser�o persistidos no Banco de
+	 *            Objeto que contem os valores que serão persistidos no Banco de
 	 *            Dados.
 	 * @param nomeAtributo
-	 *            Nome do atributo do objeto que dever� ter o valor formatado.
+	 *            Nome do atributo do objeto que deverá ter o valor formatado.
 	 * @return String contendo o valor formatado para ser persistido no banco de
 	 *         dados.
 	 * @throws IllegalArgumentException

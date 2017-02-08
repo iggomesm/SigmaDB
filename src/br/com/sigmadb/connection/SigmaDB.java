@@ -22,7 +22,7 @@ import br.com.sigmadb.beans.utilitarios.ComandoSqlIN;
 import br.com.sigmadb.beans.utilitarios.CommandQuery;
 import br.com.sigmadb.beans.utilitarios.Ilog;
 import br.com.sigmadb.beans.utilitarios.Ordenacao;
-import br.com.sigmadb.enumerations.EnumOperacaoBD;
+import br.com.sigmadb.enumerations.OperacaoBD;
 import br.com.sigmadb.exceptions.SigmaDBException;
 import br.com.sigmadb.utilitarios.ConnectionLog;
 import br.com.sigmadb.utilitarios.Filtro;
@@ -83,7 +83,7 @@ public class SigmaDB {
 	 * @throws SQLException
 	 * @throws SigmaDBException
 	 */
-	public ConnectionLog abreConexaoConsulta() throws ClassNotFoundException,
+	private ConnectionLog abreConexaoConsulta() throws ClassNotFoundException,
 			SQLException, SigmaDBException {
 
 		DataBase dataBase = DataBase.getSingleton();
@@ -107,11 +107,11 @@ public class SigmaDB {
 
 		if (connectionLog != null && connectionLog.getConnection() != null) {
 
-			if (connectionLog.isGeraEstruturaIlog()) {
+			if (connectionLog.isGeraEstruturaIlog() && Boolean.parseBoolean(DataBase.getUseIlog())) {
 				
 				for (Ilog ilog : connectionLog.getListaLogs()) {
 					this.applyUpdateTableMaster(ilog, connectionLog,
-							EnumOperacaoBD.INSERT);
+							OperacaoBD.INSERT);
 				}
 			}
 
@@ -165,7 +165,7 @@ public class SigmaDB {
 	 * @throws Exception
 	 */
 	public void applyUpdateTableMaster(TableMaster tableMaster,
-			ConnectionLog connectionLog, EnumOperacaoBD operacao)
+			ConnectionLog connectionLog, OperacaoBD operacao)
 			throws Exception {
 
 		boolean ehTabelaIlog = tableMaster instanceof Ilog;
@@ -176,11 +176,11 @@ public class SigmaDB {
 
 		String sql = null;
 
-		if (operacao == EnumOperacaoBD.INSERT) {
+		if (operacao == OperacaoBD.INSERT) {
 			sql = tableMaster.toInsert();
-		} else if (operacao == EnumOperacaoBD.UPDATE) {
+		} else if (operacao == OperacaoBD.UPDATE) {
 			sql = tableMaster.toUpdate();
-		} else if (operacao == EnumOperacaoBD.DELETE) {
+		} else if (operacao == OperacaoBD.DELETE) {
 			sql = tableMaster.toDelete();
 		} else {
 			throw new SigmaDBException(
@@ -209,7 +209,7 @@ public class SigmaDB {
 	 * @throws Exception
 	 */
 	private void montaIlog(TableMaster tableMaster,
-			ConnectionLog connectionLog, EnumOperacaoBD operacao)
+			ConnectionLog connectionLog, OperacaoBD operacao)
 			throws Exception {
 		
 		if (connectionLog.isGeraEstruturaIlog()) {
@@ -244,14 +244,29 @@ public class SigmaDB {
 
 	/**
 	 * Realiza uma consulta ao banco tomando como base para restrição nos
+	 * parâmetros atributos do bean informado.
+	 * 
+	 * @param bean
+	 *            Bean cujo os valores dos seus atributos serão a restrição para a consulta.
+	 *            
+	 * @return Lista de objetos do tipo do parâmetro bean contendo o resultado da
+	 *         consulta.
+	 * @throws Exception
+	 */
+	public <E> List<E> pesquisaTabela(E bean) throws Exception {
+		return this.pesquisaTabela(bean, null);
+	}
+	
+	/**
+	 * Realiza uma consulta ao banco tomando como base para restrição nos
 	 * parâmetros atributos do objeto vo, where e command.
 	 * 
 	 * @param bean
-	 *            VO com os campos preenchidos para cláusulas where
+	 *            Bean cujo os valores dos seus atributos serão a restrição para a consulta.
 	 * @param command
 	 *            Objeto contendo restrições complementares a consulta.
 	 * @see {@link CommandQuery}
-	 * @return Lista de objetos do tipo do parâmetro vo contendo o resultado da
+	 * @return Lista de objetos do tipo do parâmetro bean contendo o resultado da
 	 *         consulta.
 	 * @throws Exception
 	 */
@@ -299,21 +314,27 @@ public class SigmaDB {
 	 *            Sintaxe sql da consulta sem o conteúdo "select * from". Ou
 	 *            seja, iniciada pelo nome da tabela seguida dos seus joins.
 	 * @param bean
-	 *            VO com os campos preenchidos para cláusulas where *
+	 *            Bean cujo os valores dos seus atributos serão a restrição para a consulta.
 	 * @param command
 	 *            Objeto contendo restrições complementares a consulta.
 	 * @see {@link CommandQuery}
-	 * @return Lista de objetos do tipo do parâmetro vo contendo o resultado da
+	 * @return Lista de objetos do tipo do parâmetro bean contendo o resultado da
 	 *         consulta.
 	 * @throws Exception
 	 */
 	protected <E> List<E> pesquisaTabela(String sqlConsulta, E bean,
 			CommandQuery command) throws Exception {
-		//return this.pesquisaTabela(sqlConsulta, bean, null, command);
-		ConnectionLog connection = command.getConnectionLog();
 		
-		boolean abreConexao = connection == null ||
+		boolean abreConexao = true;
+		ConnectionLog connection = null;
+		
+		if (command != null) {
+		
+			connection = command.getConnectionLog();
+		
+			abreConexao = connection == null ||
 							  connection.getConnection() == null;
+		}
 		
 		connection = abreConexao ? this.abreConexaoConsulta() : connection;
 
@@ -358,10 +379,12 @@ public class SigmaDB {
 
 		where += this.preparaClausulaWhereCommandQuery(command);		
 
+		String colunasRetorno = this.pegaColunasRetornoConsulta(command);
+		
 		if (SigmaDBUtil.isNullOrEmpty(sqlConsulta)) {
-			query = new StringBuffer("SELECT * FROM " + SigmaDBUtil.pegaNomeTabela(bean));
+			query = new StringBuffer("SELECT " + colunasRetorno + " FROM " + SigmaDBUtil.pegaNomeTabela(bean));
 		} else if (!sqlConsulta.toLowerCase().contains("select")){
-			query = new StringBuffer("SELECT * FROM " + sqlConsulta);
+			query = new StringBuffer("SELECT " + colunasRetorno + " FROM " + sqlConsulta);
 		} else {
 			query = new StringBuffer(sqlConsulta);
 		}
@@ -403,6 +426,36 @@ public class SigmaDB {
 	}
 	
 	/**
+	 * Monta em sintaxe sql quais são as colunas que o usuário adicionou no CommandQuery como retorno da consulta.
+	 * @param command Objeto contendo restrições complementares a consulta.
+	 * @return String contendo as colunas que deverão ser retornadas pela consulta.
+	 */
+	private String pegaColunasRetornoConsulta(CommandQuery command) {
+
+		String colunasConsulta = "*";
+		
+		if (command != null) {
+		
+			List<String> listaColunasRetorno = command.getListaColunasRetorno();
+
+			if (!SigmaDBUtil.isNullOrEmpty(listaColunasRetorno)){
+
+				StringBuffer colunasRetornoConsulta = new StringBuffer();
+
+				for (String nomeColuna : listaColunasRetorno) {
+
+					colunasRetornoConsulta.append(nomeColuna);
+					colunasRetornoConsulta.append(", ");
+				}
+
+				colunasConsulta = colunasRetornoConsulta.substring(0, colunasRetornoConsulta.length() - 2);
+			} 
+		}
+		
+		return colunasConsulta;
+	}
+	
+	/**
 	 * Converte o resultado de uma consulta, que está contido num {@link ResultSet} numa lista de objetos do mesmo tipo informado como parâmetro de filtro para consulta.
 	 * @param resultSet Objeto contendo o resultado da consulta.
 	 * @param propriedades Mapa contendo todas as propriedades que deverão ser preenchidas.
@@ -410,7 +463,7 @@ public class SigmaDB {
 	 * @return Lista de objetos do mesmo tipo da instância informada como parâmetro representando o resultado da consulta.
 	 * @throws Exception
 	 */
-	protected List preencherResultSet(ResultSet resultSet, Map propriedades,
+	private List preencherResultSet(ResultSet resultSet, Map<String, Object> propriedades,
 			Object bean) throws Exception {
 		
 		List resultado = new ArrayList();
@@ -428,11 +481,9 @@ public class SigmaDB {
 						&& !propriedadeNome.equalsIgnoreCase("class")
 						&& colunasResultSet.contains(propriedadeNome.toLowerCase())) {
 					
-					String propriedadeTipo = PropertyUtils.getPropertyType(bean,
-							propriedadeNome).getName();
+					Class tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(bean, SigmaDBReflectionUtil.getNomeMetodoGet(propriedadeNome));
 					
-					Object valor = extraiValorResultSet(resultSet, propriedadeTipo,
-							propriedadeNome);
+					Object valor = extraiValorResultSet(resultSet, tipo, propriedadeNome);
 					
 					propriedades.put(propriedadeNome, valor);
 				}
@@ -440,7 +491,23 @@ public class SigmaDB {
 
 			Class classeBean = bean.getClass();
 			Object instancia = classeBean.newInstance();
-			BeanUtils.populate(instancia, propriedades);
+			//BeanUtils.populate(instancia, propriedades);
+			for (Map.Entry<String, Object> entry : propriedades.entrySet()) {
+			  
+				String nome = entry.getKey();
+				Object valor = entry.getValue();
+				
+				Class tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(instancia, SigmaDBReflectionUtil.getNomeMetodoGet(nome));
+				
+				if (valor == null || valor.equals("0") || valor.equals("null")){
+					
+					valor = (tipo.isPrimitive() && !tipo.equals(char.class) ? 0 : null);
+				}
+				
+				SigmaDBReflectionUtil.setValorMetodoSetDaPropriedade(instancia, nome, valor, tipo);
+				
+			}
+			
 			resultado.add(instancia);
 		}
 
@@ -476,45 +543,52 @@ public class SigmaDB {
 	 * @return Valor contido no {@link ResultSet} que são respectivos ao tipo e nome informados no parâmetro.
 	 * @throws Exception
 	 */
-	protected static Object extraiValorResultSet(ResultSet resultSet, String datatype, String name)
+	private static Object extraiValorResultSet(ResultSet resultSet, Class datatype, String name)
 			throws Exception {
-		if (datatype.equals("java.lang.String") || datatype.equals("String")) {
+		
+		if (datatype.equals(String.class)) {
 			return resultSet.getString(name);
-		} else if (datatype.equals("java.sql.Date")) {
+		} else if (datatype.equals(java.sql.Date.class)) {
 			return resultSet.getDate(name);
-		} else if (datatype.equals("java.sql.Timestamp")) {
+		} else if (datatype.equals(java.sql.Timestamp.class)) {
 			return resultSet.getTimestamp(name);
-		} else if (datatype.equals("java.sql.Time")) {
+		} else if (datatype.equals(java.sql.Time.class)) {
 			return resultSet.getTime(name);
-		} else if (datatype.equals("double")) {
+		} else if (datatype.equals(double.class)) {
+			return resultSet.getDouble(name);
+		} else if (datatype.equals(Double.class)) {
 			return new Double(resultSet.getDouble(name));
-		} else if (datatype.equals("int")) {
+		} else if (datatype.equals(int.class)) {
+			return resultSet.getInt(name);
+		} else if (datatype.equals(Integer.class)) {
 			return new Integer(resultSet.getInt(name));
-		} else if (datatype.equals("long")) {
+		} else if (datatype.equals(long.class)) {
+			return resultSet.getLong(name);
+		} else if (datatype.equals(Long.class)) {
 			return new Long(resultSet.getLong(name));
-		} else if (datatype.equals("java.lang.Double")) {
-			return new Double(resultSet.getDouble(name));
-		} else if (datatype.equals("java.lang.Integer")) {
-			return new Integer(resultSet.getInt(name));
-		} else if (datatype.equals("java.lang.Long")) {
-			return new Long(resultSet.getLong(name));
-		} else if (datatype.equals("java.lang.Float")) {
+		} else if (datatype.equals(float.class)) {
+			return resultSet.getFloat(name);
+		} else if (datatype.equals(Float.class)) {
 			return new Float(resultSet.getFloat(name));
-		} else if (datatype.equals("java.lang.Short")) {
+		} else if (datatype.equals(short.class)) {
+			return resultSet.getShort(name);
+		} else if (datatype.equals(Short.class)) {
 			return new Short(resultSet.getShort(name));
-		} else if (datatype.equals("java.lang.Byte")) {
+		} else if (datatype.equals(byte.class)) {
+			return resultSet.getByte(name);
+		} else if (datatype.equals(Byte.class)) {
 			return new Byte(resultSet.getByte(name));
-		} else if (datatype.equals("java.math.BigDecimal")) {
-			return resultSet.getBigDecimal(name);
-		} else if (datatype.equals("java.io.InputStream")) {
+		}  else if (datatype.equals(java.io.InputStream.class)) {
 			return resultSet.getAsciiStream(name);
-		} else if (datatype.equals("boolean")) {
+		} else if (datatype.equals(boolean.class)) {
+			return resultSet.getBoolean(name);
+		} else if (datatype.equals(Boolean.class)) {
 			return new Boolean(resultSet.getBoolean(name));
-		} else if (datatype.equals("java.sql.Array")) {
+		} else if (datatype.equals(java.sql.Array.class)) {
 			return resultSet.getArray(name);
-		} else if (datatype.equals("java.sql.Blob")) {
+		} else if (datatype.equals(java.sql.Blob.class)) {
 			return resultSet.getBlob(name);
-		} else if (datatype.equals("java.sql.Clob")) {
+		} else if (datatype.equals(java.sql.Clob.class)) {
 			return resultSet.getClob(name);
 		} else {
 			return resultSet.getObject(name);
@@ -532,32 +606,32 @@ public class SigmaDB {
 	 */
 	private boolean verificaAtributoValorNulo(String nomeAtributo, Map propriedades,
 			Object bean) throws Exception {
-		String propriedadeTipo = PropertyUtils.getPropertyType(bean,
-				nomeAtributo).getName();
-
-		if ("int".equals(propriedadeTipo)
+		
+		Class tipo = SigmaDBReflectionUtil.pegaTipoDoMetodoGet(bean, SigmaDBReflectionUtil.getNomeMetodoGet(nomeAtributo));
+		
+		if ((int.class.equals(tipo) || Integer.class.equals(tipo))
 				&& "0".equals(propriedades.get(nomeAtributo))) {
 			return false;
 		}
 
-		if ("double".equals(propriedadeTipo)
+		if ((double.class.equals(tipo) || Double.class.equals(tipo))
 				&& "0.0".equals(propriedades.get(nomeAtributo))) {
 			return false;
 		}
 
-		if ("java.lang.String".equals(propriedadeTipo)
+		if (String.class.equals(tipo)
 				&& ("".equals(propriedades.get(nomeAtributo)) || "null"
 						.equalsIgnoreCase(String.valueOf(propriedades
 								.get(nomeAtributo))))) {
 			return false;
 		}
 
-		if ("long".equals(propriedadeTipo)
+		if ((long.class.equals(tipo) || Long.class.equals(tipo))
 				&& "0".equals(propriedades.get(nomeAtributo))) {
 			return false;
 		}
 
-		if ("java.sql.Timestamp".equals(propriedadeTipo)
+		if (Timestamp.class.equals(tipo)
 				&& "null".equalsIgnoreCase(String.valueOf(propriedades
 						.get(nomeAtributo)))) {
 			return false;
@@ -566,16 +640,16 @@ public class SigmaDB {
 		return true;
 	}
 
-	protected Map gerarMapaPropriedades(String[] propriedadesExcluidas,
-			Object vo) throws IllegalAccessException,
+	private Map gerarMapaPropriedades(String[] propriedadesExcluidas,
+			Object bean) throws IllegalAccessException,
 			InvocationTargetException, NoSuchMethodException {
 		Map propriedades = new HashMap();
 
 		List<String> listaAtributos = SigmaDBReflectionUtil
-				.listaNomeDosAtributosDoObjetoVO(vo);
+				.listaNomeDosAtributosDoObjetoVO(bean);
 
 		for (String atributo : listaAtributos) {
-			Object valor = SigmaDBReflectionUtil.getValorMetodoGet(vo, atributo);
+			Object valor = SigmaDBReflectionUtil.getValorMetodoGet(bean, atributo);
 			propriedades.put(atributo, String.valueOf(valor));
 		}
 		List remover = new ArrayList();
@@ -610,7 +684,7 @@ public class SigmaDB {
 	 *         retornada uma String em branco.
 	 * @see {@link ComandoSqlIN}
 	 */
-	protected String whereIn(ComandoSqlIN restricao) {
+	private String whereIn(ComandoSqlIN restricao) {
 
 		String where = "";
 
@@ -635,7 +709,7 @@ public class SigmaDB {
 	 * @param aspasSimples Se true inclui aspas simples nos valores, se false não inclui.
 	 * @return String conteno a cláusula in.
 	 */
-	protected String whereIn(String[] valores, boolean aspasSimples) {
+	private String whereIn(String[] valores, boolean aspasSimples) {
 		if (valores.length == 0) {
 			return "";
 		}

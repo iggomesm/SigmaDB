@@ -45,7 +45,6 @@ public class SigmaDBUtil {
 
 	public static Locale loc_brasil = new Locale("pt", "BR");
 	public static DecimalFormat decimalFormat = new DecimalFormat("0.00");
-	public static final ResourceBundle bundle = ResourceBundle.getBundle(Constantes.CONFIG);;
 	public static final String MASCARA_CPF = "###.###.###-##";
 	public static final String MASCARA_CNPJ = "##.###.###/####-##";
 	public static final String MASCARA_TELEFONE = "(##) ####-####";
