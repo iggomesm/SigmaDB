@@ -29,7 +29,7 @@ public class Day implements Cloneable, Serializable {
     public static int FRIDAY = 6;
     public static int SATURDAY = 7;
     
-    public static final Day DIA_NULO = new Day(0, 0, 0);    
+        
     public final static DecimalFormat prec4 = new DecimalFormat("0000");
     public final static DecimalFormat prec2 = new DecimalFormat("00");
 
@@ -74,20 +74,9 @@ public class Day implements Cloneable, Serializable {
         }
     }
 
-    /**
-     * @param day Inteiro representado o dia do mês.
-     * @param month Inteiro representando o mês. 
-     * @param year Inteiro representando o ano.
-     */
-    public Day(int day, int month, int year) {
-        this.day = day;
-        this.month = month;
-        this.year = year;
-    }
-
-    public Day(Timestamp timestamp) {
+    public Day(Timestamp timestamp) throws SigmaDBException {
         if (timestamp == null) {
-            return;
+        	throw new SigmaDBException("Não é permitido informar um objeto null para o construtor da classe Day.");
         }
 
         GregorianCalendar todaysDate = new GregorianCalendar();
@@ -95,6 +84,10 @@ public class Day implements Cloneable, Serializable {
         year = todaysDate.get(Calendar.YEAR);
         month = todaysDate.get(Calendar.MONTH) + 1;
         day = todaysDate.get(Calendar.DAY_OF_MONTH);
+    }
+    
+    public Day(Date date) throws SigmaDBException {
+    	this(date == null ? null : new Timestamp(date.getTime()));    	
     }
 
     public Day(long time) {
@@ -452,22 +445,6 @@ public class Day implements Cloneable, Serializable {
         date.setSeconds(59);
       
         return  date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
-    }
-    
-    //Retorna um array de dias , dado um dia e o periodo
-    public Day[] diasDoPeriodo(Day dia,int periodo){
-    	 Day [] dataFaturas = new Day [periodo]; 
-    	 int meses = dia.getMonth();
-		 int ano = dia.getYear();
-		 for (int i = 0; i < periodo; i++) {
-			 if(meses > 12){
-			 	meses = 1;
-			 	ano++;
-			 }
-			 dataFaturas[i] = new Day(dia.getDay(),meses,ano);
-			 meses ++;
-		 }
-		 return dataFaturas;
     }
     
     public static Timestamp zeraHoraData(long time){

@@ -21,7 +21,7 @@ import br.com.sigmadb.beans.utilitarios.ComandoSqlIN;
 import br.com.sigmadb.beans.utilitarios.CommandQuery;
 import br.com.sigmadb.beans.utilitarios.Ilog;
 import br.com.sigmadb.beans.utilitarios.Ordenacao;
-import br.com.sigmadb.enumerations.OperacaoBD;
+import br.com.sigmadb.enumerations.DBOperation;
 import br.com.sigmadb.exceptions.SigmaDBException;
 import br.com.sigmadb.utilitarios.ConnectionLog;
 import br.com.sigmadb.utilitarios.Filtro;
@@ -110,7 +110,7 @@ public class SigmaDB {
 				
 				for (Ilog ilog : connectionLog.getListaLogs()) {
 					this.applyUpdateTableMaster(ilog, connectionLog,
-							OperacaoBD.INSERT);
+							DBOperation.INSERT);
 				}
 			}
 
@@ -164,7 +164,7 @@ public class SigmaDB {
 	 * @throws Exception
 	 */
 	public void applyUpdateTableMaster(TableMaster tableMaster,
-			ConnectionLog connectionLog, OperacaoBD operacao)
+			ConnectionLog connectionLog, DBOperation operacao)
 			throws Exception {
 
 		boolean ehTabelaIlog = tableMaster instanceof Ilog;
@@ -175,11 +175,11 @@ public class SigmaDB {
 
 		String sql = null;
 
-		if (operacao == OperacaoBD.INSERT) {
+		if (operacao == DBOperation.INSERT) {
 			sql = tableMaster.toInsert();
-		} else if (operacao == OperacaoBD.UPDATE) {
+		} else if (operacao == DBOperation.UPDATE) {
 			sql = tableMaster.toUpdate();
-		} else if (operacao == OperacaoBD.DELETE) {
+		} else if (operacao == DBOperation.DELETE) {
 			sql = tableMaster.toDelete();
 		} else {
 			throw new SigmaDBException(
@@ -208,7 +208,7 @@ public class SigmaDB {
 	 * @throws Exception
 	 */
 	private void montaIlog(TableMaster tableMaster,
-			ConnectionLog connectionLog, OperacaoBD operacao)
+			ConnectionLog connectionLog, DBOperation operacao)
 			throws Exception {
 		
 		if (connectionLog.isGeraEstruturaIlog()) {
@@ -669,7 +669,7 @@ public class SigmaDB {
 			return false;
 		}
 		
-		if (Date.class.equals(tipo)
+		if (java.sql.Date.class.equals(tipo)
 				&& "null".equalsIgnoreCase(String.valueOf(propriedades
 						.get(nomeAtributo)))) {
 			return false;
