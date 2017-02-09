@@ -117,6 +117,19 @@ public class Day implements Cloneable, Serializable {
         return new Timestamp(calendar.getTimeInMillis());
     }
     
+    public Timestamp toTimestampZeroHour() {
+    	
+    	return (this.zeraHoraData(toTimestamp().getTime()));
+    }
+    
+    public java.sql.Date toDate() {
+    	return new java.sql.Date(toTimestampZeroHour().getTime());
+    }
+    
+    public java.sql.Time toTime() {
+    	return new java.sql.Time(toTimestamp().getTime());
+    }
+    
     public boolean maiorQue(Day dia) {
         int value = daysBetween(dia);
 
@@ -456,4 +469,19 @@ public class Day implements Cloneable, Serializable {
 		 }
 		 return dataFaturas;
     }
+    
+    public static Timestamp zeraHoraData(long time){
+		
+		Calendar calendar = Calendar.getInstance(); 
+	    
+	    calendar.setTimeInMillis(time);  
+        calendar.set(Calendar.HOUR_OF_DAY, 0);  
+        calendar.set(Calendar.MINUTE, 0);  
+        calendar.set(Calendar.SECOND, 0);  
+        calendar.set(Calendar.MILLISECOND, 0);
+		
+        Timestamp timestampHoraZerada = new Timestamp(calendar.getTimeInMillis());
+        
+        return timestampHoraZerada;
+	}
 }
