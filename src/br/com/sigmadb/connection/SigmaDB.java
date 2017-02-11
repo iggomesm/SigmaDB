@@ -19,15 +19,17 @@ import org.codehaus.jackson.map.ObjectMapper;
 import br.com.sigmadb.beans.utilitarios.BeanFilter;
 import br.com.sigmadb.beans.utilitarios.ComandoSqlIN;
 import br.com.sigmadb.beans.utilitarios.CommandQuery;
+import br.com.sigmadb.beans.utilitarios.DBOperationFilter;
 import br.com.sigmadb.beans.utilitarios.Ilog;
 import br.com.sigmadb.beans.utilitarios.Ordenacao;
-import br.com.sigmadb.enumerations.DBOperation;
+import br.com.sigmadb.enumerations.TypeOperation;
 import br.com.sigmadb.exceptions.SigmaDBException;
-import br.com.sigmadb.utilitarios.ConnectionLog;
-import br.com.sigmadb.utilitarios.Filtro;
-import br.com.sigmadb.utilitarios.SigmaDBReflectionUtil;
-import br.com.sigmadb.utilitarios.SigmaDBUtil;
-import br.com.sigmadb.utilitarios.TableMaster;
+import br.com.sigmadb.util.ConnectionLog;
+import br.com.sigmadb.util.SigmaDBReflectionUtil;
+import br.com.sigmadb.util.SigmaDBUtil;
+import br.com.sigmadb.util.TableMaster;
+import br.com.sigmadb.util.interfaces.DBOperation;
+import br.com.sigmadb.util.interfaces.Filter;
 
 public class SigmaDB {
 
@@ -110,7 +112,7 @@ public class SigmaDB {
 				
 				for (Ilog ilog : connectionLog.getListaLogs()) {
 					this.applyUpdateTableMaster(ilog, connectionLog,
-							DBOperation.INSERT);
+							TypeOperation.INSERT);
 				}
 			}
 
@@ -162,11 +164,15 @@ public class SigmaDB {
 	 *            Tipo de operacação que será realizada.
 	 * @return 1 se houve alteração, -1 se não houve.
 	 * @throws Exception
+	 * @see {@link TypeOperation}
+	 * @see DBOperationFilter
 	 */
 	public void applyUpdateTableMaster(TableMaster tableMaster,
-			ConnectionLog connectionLog, DBOperation operacao)
+			ConnectionLog connectionLog, DBOperation dbOperation)
 			throws Exception {
 
+		TypeOperation operacao = dbOperation.getTypeOperation();
+		
 		boolean ehTabelaIlog = tableMaster instanceof Ilog;
 
 		if (!ehTabelaIlog) {
@@ -175,16 +181,13 @@ public class SigmaDB {
 
 		String sql = null;
 
-		if (operacao == DBOperation.INSERT) {
+		if (operacao == TypeOperation.INSERT) {
 			sql = tableMaster.toInsert();
-		} else if (operacao == DBOperation.UPDATE) {
-			sql = tableMaster.toUpdate();
-		} else if (operacao == DBOperation.DELETE) {
-			sql = tableMaster.toDelete();
-		} else {
-			throw new SigmaDBException(
-					"MODO DE OPERAÇÃO DO BANCO INVÁLIDO NO MOMENTO DE ATUALIZAR.");
-		}
+		} else if (operacao == TypeOperation.UPDATE) {
+			sql = tableMaster.toUpdate(dbOperation.getFilters());
+		} else if (operacao == TypeOperation.DELETE) {
+			sql = tableMaster.toDelete(dbOperation.getFilters());
+		} 
 
 		int idRegistro = DataBase.applyUpdates(sql,
 				connectionLog.getConnection());
@@ -208,7 +211,7 @@ public class SigmaDB {
 	 * @throws Exception
 	 */
 	private void montaIlog(TableMaster tableMaster,
-			ConnectionLog connectionLog, DBOperation operacao)
+			ConnectionLog connectionLog, TypeOperation operacao)
 			throws Exception {
 		
 		if (connectionLog.isGeraEstruturaIlog()) {
@@ -860,7 +863,7 @@ public class SigmaDB {
 	private String montaRestricaoANDcommandConsulta(CommandQuery command, boolean adicionouClausula) {
 
 		StringBuffer restricao = new StringBuffer();
-		List<Filtro> listaRestricao= command.getListaRestricaoAND();
+		List<Filter> listaRestricao= command.getListaRestricaoAND();
 
 		String restricaoRetorno = "";
 		
@@ -870,7 +873,7 @@ public class SigmaDB {
 				restricao.append(" and ");
 			}
 
-			for (Filtro filtro : listaRestricao) {
+			for (Filter filtro : listaRestricao) {
 				
 				restricao.append(filtro.getSQL() + " and ");
 			}
@@ -898,7 +901,7 @@ public class SigmaDB {
 	private String montaRestricaoORcommandConsulta(CommandQuery command, boolean adicionouClausula) {
 
 		StringBuffer restricaoOR = new StringBuffer();
-		List<Filtro> listaRestricaoOR = command.getListaRestricaoOR();
+		List<Filter> listaRestricaoOR = command.getListaRestricaoOR();
 
 		String restricaoRetorno = "";
 		
@@ -909,7 +912,7 @@ public class SigmaDB {
 			}
 			
 			restricaoOR.append("(");
-			for (Filtro filtro : listaRestricaoOR) {
+			for (Filter filtro : listaRestricaoOR) {
 				
 				restricaoOR.append(filtro.getSQL() + " OR ");
 			}

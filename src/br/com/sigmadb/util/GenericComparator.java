@@ -1,4 +1,4 @@
-package br.com.sigmadb.utilitarios;
+package br.com.sigmadb.util;
 
 import java.lang.reflect.Method;
 import java.sql.Timestamp;

@@ -1,4 +1,4 @@
-package br.com.sigmadb.utilitarios;
+package br.com.sigmadb.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
@@ -6,6 +6,7 @@ import java.util.List;
 
 import br.com.sigmadb.annotations.PKTableMaster;
 import br.com.sigmadb.exceptions.SigmaDBException;
+import br.com.sigmadb.util.interfaces.Filter;
 
 public abstract class TableMaster {
 	
@@ -17,9 +18,9 @@ public abstract class TableMaster {
 	public abstract void setId(int id) throws Exception;
 	
 	/**
-	 * Montar� a sint�xe sql de insert de uma tabela.
+	 * Montará a sintáxe sql de insert de uma tabela.
 	 * 
-	 * @return String contendo a sint�xe slq que ser� enviada ao banco.
+	 * @return String contendo a sintáxe slq que será enviada ao banco.
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
 	 * @throws IllegalArgumentException
@@ -29,27 +30,27 @@ public abstract class TableMaster {
 	}
 
 	/**
-	 * Montar� a sint�xe sql de upadte de uma tabela.
-	 * 
-	 * @return String contendo a sint�xe slq que ser� enviada ao banco.
+	 * Montará a sintáxe sql de upadte de uma tabela.
+	 * @param filtros Listagem de filtros que irão compor a cláusula where do Update
+	 * @return String contendo a sintáxe slq que será enviada ao banco.
 	 */
-	public String toUpdate() throws Exception {
-		return toUpdate(this);
+	public String toUpdate(List<Filter> filtros) throws Exception {
+		return toUpdate(this, filtros);
 	}
 
 	/**
-	 * Montar� a sint�xe sql de delete de uma tabela.
-	 * 
-	 * @return String contendo a sint�xe slq que ser� enviada ao banco.
+	 * Montará a sintáxe sql de delete de uma tabela.
+	 * @param filtros Listagem de filtros que irão compor a cláusula where do Delete
+	 * @return String contendo a sintáxe slq que será enviada ao banco.
 	 */
-	public String toDelete() throws Exception {
-		return toDelete(this);
+	public String toDelete(List<Filter> filtros) throws Exception {
+		return toDelete(this, filtros);
 	}
 
 	/**
-	 * Montar� a sint�xe sql de insert de uma tabela.
+	 * Montará a sintáxe sql de insert de uma tabela.
 	 * 
-	 * @return String contendo a sint�xe sql que ser� enviada ao banco.
+	 * @return String contendo a sintáxe sql que será enviada ao banco.
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
 	 * @throws IllegalArgumentException
@@ -114,15 +115,16 @@ public abstract class TableMaster {
 	}
 
 	/**
-	 * Montar� a sint�xe sql de update de uma tabela.
-	 * 
-	 * @return String contendo a sint�xe sql que ser� enviada ao banco.
+	 * Montará a sintáxe sql de update de uma tabela.
+	 * @param objeto Objeto contendo todos os dados que serão persistidos no banco.
+	 * @param filtros Listagem de filtros que irão compor a cláusula where do Update
+	 * @return String contendo a sintáxe sql que será enviada ao banco.
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
 	 * @throws IllegalArgumentException
 	 * @throws RestricaoException 
 	 */
-	protected String toUpdate(Object objeto) throws Exception {
+	protected String toUpdate(Object objeto, List<Filter> filtros) throws Exception {
 
 		String nomeTabela = SigmaDBUtil.pegaNomeTabela(objeto);
 		List<String> listaAtributos = SigmaDBReflectionUtil
@@ -144,7 +146,7 @@ public abstract class TableMaster {
 			}
 		}
 
-		String where = this.montaClausulaWhere(objeto);
+		String where = this.montaClausulaWhere(objeto, filtros);
 
 		sql.append(where);
 
@@ -152,22 +154,23 @@ public abstract class TableMaster {
 	}
 
 	/**
-	 * Montar� a sint�xe sql de delete de uma tabela.
-	 * 
-	 * @return String contendo a sint�xe sql que ser� enviada ao banco.
+	 * Montará a sintáxe sql de delete de uma tabela.
+	 * @param objeto Objeto contendo todos os dados que serão deletados no banco.
+	 * @param filtros Listagem de filtros que irão compor a cláusula where do Delete
+	 * @return String contendo a sintáxe sql que será enviada ao banco.
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
 	 * @throws IllegalArgumentException
 	 * @throws RestricaoException 
 	 */
-	protected String toDelete(Object objeto) throws Exception {
+	protected String toDelete(Object objeto, List<Filter> filtros) throws Exception {
 
 		String nomeTabela = SigmaDBUtil.pegaNomeTabela(objeto);
 
 		StringBuffer sql = new StringBuffer("DELETE FROM "
 				+ nomeTabela.toUpperCase());
 
-		String where = this.montaClausulaWhere(objeto);
+		String where = this.montaClausulaWhere(objeto, filtros);
 
 		sql.append(where);
 
@@ -181,13 +184,14 @@ public abstract class TableMaster {
 	 * @param objeto
 	 *            Objeto que contenha uma {@link PKTableMaster} indicando uma ou
 	 *            mais PrimaryKeys.
+	 * @param filtros Listagem de filtros que irão compor a cláusula where da operação.           
 	 * @return Cláusula where montada.
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 * @throws InvocationTargetException
 	 * @throws RestricaoException 
 	 */
-	private String montaClausulaWhere(Object objeto)
+	private String montaClausulaWhere(Object objeto, List<Filter> filtros)
 			throws Exception {
 
 		final String where = " WHERE ";
@@ -195,6 +199,10 @@ public abstract class TableMaster {
 		StringBuffer clausulaWhere = new StringBuffer(where);
 
 		List<String> listaPk = SigmaDBReflectionUtil.pegaColunasPK(objeto.getClass());
+		
+		if (SigmaDBUtil.isNullOrEmpty(listaPk) && SigmaDBUtil.isNullOrEmpty(filtros)) {
+			throw new SigmaDBException("Não é possível realizar UPDATE ou DELETE sem que esteja informada uma PK ou um filtro válido para a cláusula WHERE.");
+		}
 
 		for (Iterator iterator = listaPk.iterator(); iterator.hasNext();) {
 			String atributo = (String) iterator.next();
@@ -207,6 +215,25 @@ public abstract class TableMaster {
 			if (iterator.hasNext()) {
 				clausulaWhere.append(" AND ");
 			}
+		}
+		
+		if (!SigmaDBUtil.isNullOrEmpty(filtros)){
+			
+			if (!SigmaDBUtil.isNullOrEmpty(listaPk)) {
+				clausulaWhere.append(" AND ");
+			}
+			
+			for (Iterator iterator = filtros.iterator(); iterator.hasNext();) {
+				Filter filter = (Filter) iterator.next();
+				
+				clausulaWhere.append(filter.getSQL());
+				
+				if (iterator.hasNext()) {
+					clausulaWhere.append(" AND ");
+				}
+				
+			}
+			
 		}
 
 		if (clausulaWhere.toString().equals(where)){

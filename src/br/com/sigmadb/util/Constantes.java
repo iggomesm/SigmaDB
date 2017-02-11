@@ -1,4 +1,4 @@
-package br.com.sigmadb.utilitarios;
+package br.com.sigmadb.util;
 
 public class Constantes {
     public static final String CONFIG = "SigmaDBProperties";

@@ -1,6 +1,17 @@
-package br.com.sigmadb.utilitarios;
+package br.com.sigmadb.util.interfaces;
 
-public interface Filtro<E> {
+import br.com.sigmadb.beans.utilitarios.NullOperationFilter;
+import br.com.sigmadb.beans.utilitarios.RelationalOperationFilter;
+
+/**
+ * Interface que representa filtros para Beans.
+ * @author Igor Moisés
+ * @see RelationalOperationFilter
+ * @see NullOperationFilter
+ *
+ * @param <E>
+ */
+public interface Filter<E> {
 
 	/**
 	 * Seta o nome da proprieade do filtro.

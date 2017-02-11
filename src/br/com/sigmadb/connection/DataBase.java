@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import br.com.sigmadb.enumerations.EnumVersionador;
-import br.com.sigmadb.utilitarios.Constantes;
+import br.com.sigmadb.util.Constantes;
 /**
  * Classe responsável por demandar qualquer sintaxe sql ao banco.
  * @author igorjua

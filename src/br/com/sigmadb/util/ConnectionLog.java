@@ -1,4 +1,4 @@
-package br.com.sigmadb.utilitarios;
+package br.com.sigmadb.util;
 
 import java.sql.Connection;
 import java.util.ArrayList;

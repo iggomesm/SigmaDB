@@ -1,4 +1,4 @@
-package br.com.sigmadb.utilitarios;
+package br.com.sigmadb.util;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;

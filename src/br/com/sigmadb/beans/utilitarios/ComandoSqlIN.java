@@ -2,7 +2,7 @@ package br.com.sigmadb.beans.utilitarios;
 
 import java.util.List;
 
-import br.com.sigmadb.utilitarios.SigmaDBUtil;
+import br.com.sigmadb.util.SigmaDBUtil;
 
 /**
  * Classe utilizada para a aplicação de restrições do tipo IN nas consultas SQL.

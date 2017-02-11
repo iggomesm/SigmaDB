@@ -3,7 +3,7 @@ package br.com.sigmadb.beans.utilitarios;
 import java.sql.Timestamp;
 
 import br.com.sigmadb.annotations.PKTableMaster;
-import br.com.sigmadb.utilitarios.TableMaster;
+import br.com.sigmadb.util.TableMaster;
 
 public class Ilog extends TableMaster {
 	@PKTableMaster
