@@ -54,6 +54,8 @@ public class DBOperationFilter implements DBOperation {
 		
 		this.listaFiltros = new ArrayList<Filter>();
 		this.listaFiltros.addAll(filters);
+		
+		this.typeOperation = typeOperation;
 	}
 	
 	private void validaTypeOperation(TypeOperation typeOperation) {
