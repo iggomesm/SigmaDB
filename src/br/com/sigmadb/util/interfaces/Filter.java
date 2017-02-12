@@ -1,13 +1,13 @@
 package br.com.sigmadb.util.interfaces;
 
-import br.com.sigmadb.beans.utilitarios.NullOperationFilter;
-import br.com.sigmadb.beans.utilitarios.RelationalOperationFilter;
+import br.com.sigmadb.beans.utilitarios.NullOperatorFilter;
+import br.com.sigmadb.beans.utilitarios.RelationalOperatorFilter;
 
 /**
  * Interface que representa filtros para Beans.
  * @author Igor Moisés
- * @see RelationalOperationFilter
- * @see NullOperationFilter
+ * @see RelationalOperatorFilter
+ * @see NullOperatorFilter
  *
  * @param <E>
  */

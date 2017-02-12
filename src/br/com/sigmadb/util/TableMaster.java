@@ -292,8 +292,9 @@ public abstract class TableMaster {
 
 			boolean aplicaAspasSimples = tipo.equals(String.class) || 
 										 tipo.equals(java.sql.Timestamp.class) ||
-										 tipo.equals(java.sql.Date.class)||
-										 tipo.equals(java.sql.Time.class);
+										 tipo.equals(java.sql.Date.class) ||
+										 tipo.equals(java.sql.Time.class) ||
+										 tipo.equals(char.class);
 
 			Object valor = SigmaDBReflectionUtil.pegaValorDoMetodoGet(objeto,
 					nomeMetodoGet);

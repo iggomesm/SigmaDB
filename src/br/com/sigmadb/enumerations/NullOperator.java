@@ -7,7 +7,7 @@ package br.com.sigmadb.enumerations;
  * <b>IS NOT NULL</b>
  * @author Igor Moisés
  */
-public enum RestricaoNull {
+public enum NullOperator {
 
 	/**
 	 * Representa a restrição do tipo IS NULL.
@@ -33,7 +33,7 @@ public enum RestricaoNull {
 	
 	private String descricao;
 	
-	private RestricaoNull(String descricao){
+	private NullOperator(String descricao){
 		this.descricao = descricao;
 	}
 

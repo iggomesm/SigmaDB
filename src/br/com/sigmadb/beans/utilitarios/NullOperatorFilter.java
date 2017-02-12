@@ -1,6 +1,6 @@
 package br.com.sigmadb.beans.utilitarios;
 
-import br.com.sigmadb.enumerations.RestricaoNull;
+import br.com.sigmadb.enumerations.NullOperator;
 import br.com.sigmadb.exceptions.SigmaDBException;
 import br.com.sigmadb.util.SigmaDBUtil;
 import br.com.sigmadb.util.interfaces.Filter;
@@ -8,11 +8,11 @@ import br.com.sigmadb.util.interfaces.Filter;
 /**
  * epresenta uma restrição para campos nulos numa consulta SQL. A saber: Is null ou Is Not Null.
  * @author Igor Moisés
- * @see RestricaoNull
+ * @see NullOperator
  */
-public class NullOperationFilter extends BeanFilter implements Filter {
+public class NullOperatorFilter extends BeanFilter implements Filter {
 	
-	private RestricaoNull restricaoNull;
+	private NullOperator restricaoNull;
 	
 
 	/**
@@ -22,7 +22,7 @@ public class NullOperationFilter extends BeanFilter implements Filter {
 	 *            Tipo da restrição que deverá ser aplicada.
 	 * @throws SigmaDBException 
 	 */
-	public NullOperationFilter(String nomeColuna, RestricaoNull restricaoNull) throws SigmaDBException {
+	public NullOperatorFilter(String nomeColuna, NullOperator restricaoNull) throws SigmaDBException {
 		super(nomeColuna, null);
 		
 		if (SigmaDBUtil.isNullOrEmpty(nomeColuna)) {
@@ -36,11 +36,11 @@ public class NullOperationFilter extends BeanFilter implements Filter {
 		this.restricaoNull = restricaoNull;
 	}
 
-	public RestricaoNull getRestricaoNull() {
+	public NullOperator getRestricaoNull() {
 		return restricaoNull;
 	}
 
-	public void setRestricaoNull(RestricaoNull RestricaoNull) {
+	public void setRestricaoNull(NullOperator RestricaoNull) {
 		this.restricaoNull = RestricaoNull;
 	}
 

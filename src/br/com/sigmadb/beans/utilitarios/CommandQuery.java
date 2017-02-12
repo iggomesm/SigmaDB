@@ -137,9 +137,9 @@ public class CommandQuery {
 	 * Adiciona uma nova restrição ao objeto que será precedida pelo operador lógico AND.<br>
 	 * Ex. AND nomePropriedade = valorPropriedade
 	 * @param filtro Objeto contendo as definições da restrição que será adicionada ao objeto.<br>
-	 * Os tipos de filtro são {@link RelationalOperationFilter} e {@link NullOperationFilter}
-	 * @see RelationalOperationFilter
-	 * @see NullOperationFilter
+	 * Os tipos de filtro são {@link RelationalOperatorFilter} e {@link NullOperatorFilter}
+	 * @see RelationalOperatorFilter
+	 * @see NullOperatorFilter
 	 * @throws SigmaDBException
 	 */
 	public void addRestricaoAND(Filter filtro) throws SigmaDBException {
@@ -153,9 +153,9 @@ public class CommandQuery {
 	 * Adiciona uma nova restrição ao objeto que será precedida pelo operador lógico AND.<br>
 	 * Ex. AND nomePropriedade = valorPropriedade
 	 * @param filtro Objeto contendo as definições da restrição que será adicionada ao objeto.<br>
-	 * Os tipos de filtro são {@link RelationalOperationFilter} e {@link NullOperationFilter}
-	 * @see RelationalOperationFilter
-	 * @see NullOperationFilter
+	 * Os tipos de filtro são {@link RelationalOperatorFilter} e {@link NullOperatorFilter}
+	 * @see RelationalOperatorFilter
+	 * @see NullOperatorFilter
 	 * @throws SigmaDBException
 	 */
 	public void addRestricaoOR(Filter filtro) throws SigmaDBException {
@@ -181,9 +181,9 @@ public class CommandQuery {
 			throw new SigmaDBException("Não é permitido adicionar filtros com o atributo nomePropriedade nulo.");
 		}
 		
-		if (filtro instanceof NullOperationFilter) {
+		if (filtro instanceof NullOperatorFilter) {
 			
-			NullOperationFilter filtroRestricaoNull = (NullOperationFilter) filtro;
+			NullOperatorFilter filtroRestricaoNull = (NullOperatorFilter) filtro;
 			
 			if (filtroRestricaoNull.getRestricaoNull() == null) {
 				throw new SigmaDBException("Não é permitido adicionar filtros com o atributo operadorRelacional nulo.");
@@ -195,7 +195,7 @@ public class CommandQuery {
 				throw new SigmaDBException("Não é permitido adicionar filtros com o atributo valorPropriedade nulo.");
 			}
 			
-			RelationalOperationFilter filtroOperadorRelacional = (RelationalOperationFilter) filtro;
+			RelationalOperatorFilter filtroOperadorRelacional = (RelationalOperatorFilter) filtro;
 			
 			if (filtroOperadorRelacional.getOperadorRelacional() == null) {
 				throw new SigmaDBException("Não é permitido adicionar filtros com o atributo operadorRelacional nulo.");

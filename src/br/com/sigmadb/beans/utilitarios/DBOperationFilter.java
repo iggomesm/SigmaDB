@@ -22,6 +22,8 @@ public class DBOperationFilter implements DBOperation {
 	 * Gera um filtro adicional para uma operação de Update ou Delete.
 	 * @param typeOperation Tipo de operação que o filtro deve apontar.
 	 * @param filter Filtro que deve ser aplicado a cláusula where da operação. 
+	 * @see RelationalOperatorFilter
+	 * @see NullOperatorFilter
 	 */
 	public DBOperationFilter(TypeOperation typeOperation, Filter filter) {
 		
@@ -38,6 +40,8 @@ public class DBOperationFilter implements DBOperation {
 	 * Gera um filtro adicional para uma operação de Update ou Delete.
 	 * @param typeOperation Tipo de operação que o filtro deve apontar.
 	 * @param filter Lista de filtros que deverão ser aplicados a cláusula where da operação. 
+	 * @see RelationalOperatorFilter
+	 * @see NullOperatorFilter
 	 */
 	public DBOperationFilter(TypeOperation typeOperation, List<Filter> filters) {
 		

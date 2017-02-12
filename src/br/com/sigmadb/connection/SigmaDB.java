@@ -514,6 +514,13 @@ public class SigmaDB {
 					valor = (tipo.isPrimitive() && !tipo.equals(char.class) ? 0 : null);
 				}
 				
+				if (char.class.equals(tipo)) {
+					
+					Character characterValue = new Character(String.valueOf(valor).charAt(0));
+					
+					valor = characterValue.charValue();
+				}
+				
 				SigmaDBReflectionUtil.setValorMetodoSetDaPropriedade(instancia, nome, valor, tipo);
 				
 			}
@@ -629,6 +636,20 @@ public class SigmaDB {
 						.equalsIgnoreCase(String.valueOf(propriedades
 								.get(nomeAtributo))))) {
 			return false;
+		}		
+				
+		if (Character.class.equals(tipo)) {
+			
+			Character characterValue = (Character) propriedades.get(nomeAtributo);
+			
+			return characterValue != '\u0000';
+		}
+		
+		if (char.class.equals(tipo)) {
+			
+			Character characterValue = new Character(String.valueOf(propriedades.get(nomeAtributo)).charAt(0));
+			
+			return characterValue != '\u0000';
 		}
 		
 		if ((int.class.equals(tipo) || Integer.class.equals(tipo))

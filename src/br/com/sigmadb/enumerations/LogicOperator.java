@@ -7,7 +7,7 @@ package br.com.sigmadb.enumerations;
  * <b>OR</b><br>
  * @author Igor Moisés
  */
-public enum OperadorLogico {
+public enum LogicOperator {
 	/**
 	 * Indica que na consulta será inserido um AND na operação lógica.
 	 */
@@ -18,7 +18,7 @@ public enum OperadorLogico {
 	 */
 	OR(" OR ");
 	
-	private OperadorLogico(String value) {
+	private LogicOperator(String value) {
 		this.value = value;
 	}
 	

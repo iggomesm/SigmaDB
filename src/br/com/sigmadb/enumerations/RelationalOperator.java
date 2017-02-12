@@ -11,7 +11,7 @@ package br.com.sigmadb.enumerations;
  * <b>MAIOR_IGUAL ( >= )</b><br>
  * @author Igor Moisés
  */
-public enum OperadorRelacional {
+public enum RelationalOperator {
 	
 	/**
 	 * Indica que na restrição da consulta será aplicada o tipo de operador relacional Igual (=).
@@ -49,7 +49,7 @@ public enum OperadorRelacional {
 	 */
 	MAIOR_IGUAL(" >= ");
 	
-	private OperadorRelacional(String value) {
+	private RelationalOperator(String value) {
 		this.value = value;
 	}
 	

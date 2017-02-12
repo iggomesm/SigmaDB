@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
-import br.com.sigmadb.enumerations.OperadorRelacional;
+import br.com.sigmadb.enumerations.RelationalOperator;
 import br.com.sigmadb.exceptions.SigmaDBException;
 import br.com.sigmadb.util.Day;
 import br.com.sigmadb.util.SigmaDBUtil;
@@ -19,98 +19,98 @@ import br.com.sigmadb.util.interfaces.Filter;
  * 
  * @author Igor Moisés
  * @param <E>
- * @see OperadorRelacional
+ * @see RelationalOperator
  */
-public class RelationalOperationFilter extends BeanFilter implements Filter {
+public class RelationalOperatorFilter extends BeanFilter implements Filter {
 
-	private OperadorRelacional operadorRelacional;
+	private RelationalOperator operadorRelacional;
 	
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, String valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, String valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Integer valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Integer valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, int valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, int valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Double valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Double valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, double valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, double valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Float valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Float valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, float valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, float valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Short valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Short valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, short valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, short valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Long valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Long valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, long valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, long valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Byte valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Byte valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, byte valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, byte valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Boolean valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Boolean valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, boolean valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, boolean valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Date valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Date valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Timestamp valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Timestamp valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Time valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Time valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Blob valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Blob valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Clob valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Clob valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
-	public RelationalOperationFilter(String nomeColuna, OperadorRelacional operadorRelacional, Day valor) throws SigmaDBException{
+	public RelationalOperatorFilter(String nomeColuna, RelationalOperator operadorRelacional, Day valor) throws SigmaDBException{
 		super(nomeColuna, null);
 		this.preparaObjeto(nomeColuna, operadorRelacional, valor);
 	}
 	
-	private <E> void preparaObjeto(String nomeColuna, OperadorRelacional operadorRelacional, E valor) throws SigmaDBException{
+	private <E> void preparaObjeto(String nomeColuna, RelationalOperator operadorRelacional, E valor) throws SigmaDBException{
 		
 		if (SigmaDBUtil.isNullOrEmpty(nomeColuna)){
 			throw new SigmaDBException("Informe o nome de uma coluna para o filtro.");
@@ -127,7 +127,7 @@ public class RelationalOperationFilter extends BeanFilter implements Filter {
 		this.operadorRelacional = operadorRelacional;
 	}
 	
-	private <E>void setValor(E valor, OperadorRelacional operadorRelacional) {
+	private <E>void setValor(E valor, RelationalOperator operadorRelacional) {
 		
 		Map<Class, ClassesPermitidas> mapaClasse = mapeiaClassesPermitidas();
 		
@@ -149,7 +149,7 @@ public class RelationalOperationFilter extends BeanFilter implements Filter {
 
 	private Map<Class, ClassesPermitidas> mapeiaClassesPermitidas() {
 		
-		Map<Class, ClassesPermitidas> mapaClasse = new HashMap<Class, RelationalOperationFilter.ClassesPermitidas>();
+		Map<Class, ClassesPermitidas> mapaClasse = new HashMap<Class, RelationalOperatorFilter.ClassesPermitidas>();
 		
 		mapaClasse.put(String.class, ClassesPermitidas.STRING);
 		mapaClasse.put(Integer.class, ClassesPermitidas.NUMBER_BOOLEANO);
@@ -173,11 +173,11 @@ public class RelationalOperationFilter extends BeanFilter implements Filter {
 		return mapaClasse;
 	}
 
-	public OperadorRelacional getOperadorRelacional() {
+	public RelationalOperator getOperadorRelacional() {
 		return operadorRelacional;
 	}
 
-	public void setOperadorRelacional(OperadorRelacional operadorRelacional) {
+	public void setOperadorRelacional(RelationalOperator operadorRelacional) {
 		this.operadorRelacional = operadorRelacional;
 	}
 
@@ -193,35 +193,35 @@ public class RelationalOperationFilter extends BeanFilter implements Filter {
 	private enum ClassesPermitidas {
 		
 		STRING {
-			protected <E> String geraValorSQL(E valor, OperadorRelacional operador) {
+			protected <E> String geraValorSQL(E valor, RelationalOperator operador) {
 				return "'" + valor + "'";
 			}
 		},
 		NUMBER_BOOLEANO {
-			protected <E> String geraValorSQL(E valor, OperadorRelacional operador) {
+			protected <E> String geraValorSQL(E valor, RelationalOperator operador) {
 				return String.valueOf(valor);
 			}
 		},
 		DATES {
-			protected <E> String geraValorSQL(E valor, OperadorRelacional operador) {
+			protected <E> String geraValorSQL(E valor, RelationalOperator operador) {
 				return "'" + String.valueOf(valor) + "'";
 			}
 		},
 		TIMESTAMP {
-			protected <E> String geraValorSQL(E valor, OperadorRelacional operador) {
+			protected <E> String geraValorSQL(E valor, RelationalOperator operador) {
 				return "'" + String.valueOf(valor) + "'";
 			}
 		},
 		DAY {
-			protected <E> String geraValorSQL(E valor, OperadorRelacional operador) {
+			protected <E> String geraValorSQL(E valor, RelationalOperator operador) {
 				
 				String valorRetorno = "";
 				
 				Day data = (Day) valor;
 				
-				if (operador == OperadorRelacional.MAIOR_IGUAL || operador == OperadorRelacional.MAIOR_QUE) {
+				if (operador == RelationalOperator.MAIOR_IGUAL || operador == RelationalOperator.MAIOR_QUE) {
 					valorRetorno = data.getDataBanco();
-				} else if (operador == OperadorRelacional.MENOR_IGUAL || operador == OperadorRelacional.MENOR_QUE) {
+				} else if (operador == RelationalOperator.MENOR_IGUAL || operador == RelationalOperator.MENOR_QUE) {
 					valorRetorno = data.getDataBanco23h();
 				} else {
 					return "'" + String.valueOf(data.toTimestamp()) + "'";
@@ -232,7 +232,7 @@ public class RelationalOperationFilter extends BeanFilter implements Filter {
 		};
 		
 		
-		protected <E> String geraValorSQL(E valor, OperadorRelacional operador) {
+		protected <E> String geraValorSQL(E valor, RelationalOperator operador) {
 			return null;
 		}
 	}
