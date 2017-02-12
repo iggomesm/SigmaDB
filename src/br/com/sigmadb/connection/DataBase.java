@@ -1,6 +1,5 @@
 package br.com.sigmadb.connection;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,10 +56,8 @@ public class DataBase {
             resultado = stmt.executeQuery(sql);
         } catch (SQLException ex) {
             throw new SQLException(ex.getMessage() + "\n" + sql);
-        }finally {
-        	if(Boolean.parseBoolean(printSql)) {
-        		System.out.println(sql);
-        	}
+        } finally {
+        	printSQL(sql);
 		}
         return resultado;
     }
@@ -90,11 +88,35 @@ public class DataBase {
         } catch (SQLException ex) {
             throw new SQLException(ex.getMessage() + "\n" + sql);
         } finally {
-        	if(Boolean.parseBoolean(printSql)) {
-        		System.out.println(sql);
-        	}
+        	printSQL(sql);
 		}
         return idRetorno;
+    }
+    
+    private static void printSQL(String sql) {
+    	
+    	if(Boolean.parseBoolean(printSql)) {
+    		
+    		StackTraceElement []pilha = Thread.currentThread().getStackTrace();
+    		
+    		for (StackTraceElement stackTraceElement : pilha) {
+    			if(!stackTraceElement.getClassName().equals("java.lang.Thread") &&
+    					!stackTraceElement.getClassName().equals("br.com.sigmadb.connection.DataBase") &&
+    					!stackTraceElement.getClassName().equals("br.com.sigmadb.connection.SigmaDB")) {
+    				
+    				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.sss");
+    				
+    				System.out.println("=======================================================");
+    				System.out.println(stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName() + "(line " + stackTraceElement.getLineNumber() + ") - " + sdf.format(new java.util.Date()));
+    				break;
+    			}
+    			
+    		}
+    		
+    		System.out.println(sql);
+    		System.out.println();
+    	}
+    	
     }
 
     /**
