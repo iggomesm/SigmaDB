@@ -7,6 +7,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,21 +39,71 @@ public class SigmaDB {
 	 * transação com o Banco.
 	 * 
 	 * @param idUsuario
-	 *            Id da tabela pessoa que referencia uma pessoa no sistema.
+	 *            Id que represente um usuário no sistema.
 	 * @param origem
 	 *            Nome do local de origem por onde os dados da transação serão
 	 *            gravados.
 	 * @return Conexão aberta com o banco.
 	 * @throws Exception
 	 */
-	public ConnectionLog abrirConexaoPersistencia(int idUsuario, String origem)
+	public ConnectionLog abrirConexaoPersistencia(String idUsuario, String origem)
 			throws Exception {
 
 		DataBase dataBase = DataBase.getSingleton();
 
 		Connection con = dataBase.getConnection();
+		
+		ConnectionLog connectionLog = null;
+		
+		if (Boolean.valueOf(DataBase.getUseIlog())) {		
+			connectionLog = new ConnectionLog(con, idUsuario, origem, true);
+		} else {
+			connectionLog = new ConnectionLog(con, "", "", false);
+		}
 
-		ConnectionLog connectionLog = new ConnectionLog(con, idUsuario, origem, true);
+		return connectionLog;
+	}
+	
+	/**
+	 * Cria uma nova instância de conexão com o Banco. Ou seja, abre uma
+	 * transação com o Banco.
+	 * 
+	 * @param idUsuario
+	 *            Id que represente um usuário no sistema.
+	 * @param origem
+	 *            Nome do local de origem por onde os dados da transação serão
+	 *            gravados.
+	 * @return Conexão aberta com o banco.
+	 * @throws Exception
+	 */
+	public ConnectionLog abrirConexaoPersistencia(String idUsuario)
+			throws Exception {
+
+		DataBase dataBase = DataBase.getSingleton();
+
+		Connection con = dataBase.getConnection();
+		
+		StackTraceElement []pilha = Thread.currentThread().getStackTrace();
+		
+		String origem = null;
+		
+		for (StackTraceElement stackTraceElement : pilha) {
+			if(!stackTraceElement.getClassName().equals("java.lang.Thread") &&
+					!stackTraceElement.getClassName().equals("br.com.sigmadb.connection.DataBase") &&
+					!stackTraceElement.getClassName().equals("br.com.sigmadb.connection.SigmaDB")) {
+				origem = stackTraceElement.getClassName() + "." + stackTraceElement.getMethodName() + "(line " + stackTraceElement.getLineNumber() + ")";
+				break;
+			}
+			
+		}
+
+		ConnectionLog connectionLog = null;
+		
+		if (Boolean.valueOf(DataBase.getUseIlog())) {		
+			connectionLog = new ConnectionLog(con, idUsuario, origem, true);
+		} else {
+			connectionLog = new ConnectionLog(con, "", "", false);
+		}
 
 		return connectionLog;
 	}
@@ -64,12 +115,12 @@ public class SigmaDB {
 	 * @throws Exception
 	 */
 	public ConnectionLog abrirConexaoPersistencia()	throws Exception {
-
+		
 		DataBase dataBase = DataBase.getSingleton();
 
 		Connection con = dataBase.getConnection();
 
-		ConnectionLog connectionLog = new ConnectionLog(con, -1, "", false);
+		ConnectionLog connectionLog = new ConnectionLog(con, "", "", false);
 
 		return connectionLog;
 	}
@@ -224,7 +275,7 @@ public class SigmaDB {
 					colunaPk);
 
 			Timestamp dataHoraAtual = new Timestamp(new Date().getTime());
-			int usuario = connectionLog.getPess_id();
+			String usuario = connectionLog.getUsuario();
 			String origem = connectionLog.getOrigem();
 
 			ObjectMapper mapper = new ObjectMapper();

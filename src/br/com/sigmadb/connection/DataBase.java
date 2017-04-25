@@ -95,7 +95,7 @@ public class DataBase {
     
     private static void printSQL(String sql) {
     	
-    	if(Boolean.parseBoolean(printSql)) {
+    	if(Boolean.parseBoolean(printSql) && !sql.contains("sequenciador")) {
     		
     		StackTraceElement []pilha = Thread.currentThread().getStackTrace();
     		

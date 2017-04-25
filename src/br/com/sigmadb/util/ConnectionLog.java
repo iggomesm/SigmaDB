@@ -17,7 +17,7 @@ public class ConnectionLog {
 
 	private Connection connection;
 	private List<Ilog> listaLogs;
-	private int pess_id;
+	private String usuario;
 	private String origem;
 	private int versao;
 	private boolean geraEstruturaIlog;
@@ -25,15 +25,15 @@ public class ConnectionLog {
 	/**
 	 * Construtor
 	 * @param connection Objeto instanciado de conexão aberta com o banco.
-	 * @param pess_id id de uma pessoa para qual o log será destinado.
+	 * @param usuario usuario de uma pessoa para qual o log será destinado.
 	 * @param origem Nome do local de origem que solicitou a abertura da conexão.
 	 * @throws Exception 
 	 */
-	public ConnectionLog(Connection connection, int pess_id, String origem, boolean geraLog) throws Exception{
+	public ConnectionLog(Connection connection, String usuario, String origem, boolean geraLog) throws Exception{
 		
 		this.connection = connection;
 		this.listaLogs = new ArrayList<Ilog>();
-		this.pess_id = pess_id;
+		this.usuario = usuario;
 		this.origem = origem;
 		
 		this.geraEstruturaIlog = geraLog;
@@ -47,7 +47,7 @@ public class ConnectionLog {
 	/**
 	 * Construtor
 	 * @param connection Objeto instanciado de conexão aberta com o banco.
-	 * @param pess_id id de uma pessoa para qual o log será destinado.
+	 * @param usuario id de uma pessoa para qual o log será destinado.
 	 * @throws SigmaDBException 
 	 */
 	public ConnectionLog(Connection connection) throws SigmaDBException{
@@ -71,7 +71,7 @@ public class ConnectionLog {
 		
 		if (geraEstruturaIlog) {
 		
-			if (pess_id <= 0){
+			if (SigmaDBUtil.isNullOrEmpty(usuario)){
 				throw new SigmaDBException("Não é possível criar conexão sem um usuário válido.");
 			}
 
@@ -97,8 +97,8 @@ public class ConnectionLog {
 		return listaLogs;
 	}
 
-	public int getPess_id() {
-		return pess_id;
+	public String getUsuario() {
+		return usuario;
 	}
 
 	public String getOrigem() {

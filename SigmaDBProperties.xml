@@ -6,6 +6,6 @@
 <entry key="password">root</entry>
 <entry key="url">jdbc:postgresql://localhost:5432/MyClients</entry>
 <entry key="driver">org.postgresql.Driver</entry>
-<entry key="printSqlConsole">true</entry>
+<entry key="printSqlConsole">false</entry>
 <entry key="useIlog">false</entry>
 </properties>

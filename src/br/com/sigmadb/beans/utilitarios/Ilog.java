@@ -14,7 +14,7 @@ public class Ilog extends TableMaster {
 	private int ilog_pk_tabela;
 	private Timestamp ilog_data_hora;
 	private String ilog_origem;
-	private int ilog_usuario;
+	private String ilog_usuario;
 	private String ilog_valores;
 	
 	public int getIlog_id() {
@@ -73,11 +73,11 @@ public class Ilog extends TableMaster {
 		this.ilog_origem = ilog_origem;
 	}
 
-	public int getIlog_usuario() {
+	public String getIlog_usuario() {
 		return ilog_usuario;
 	}
 
-	public void setIlog_usuario(int ilog_usuario) {
+	public void setIlog_usuario(String ilog_usuario) {
 		this.ilog_usuario = ilog_usuario;
 	}
 
