@@ -31,7 +31,7 @@ public class DataBase {
     private String senha;
     private static String useIlog;
     private static String printSql;
-    private static DataBase instance = null;
+    //private static DataBase instance = null;
     public static final int ACTION_ALTEROU_VALORES = 1;
     public static final int ACTION_NAO_ALTEROU_VALORES = 0;
     public static final int TODOS_REGISTROS_ALTERADOS = 1;
@@ -181,12 +181,12 @@ public class DataBase {
 		
 	}
 
-    public static DataBase getSingleton() {
-        if (instance == null) {
-            instance = new DataBase();
-        }
-        return instance;
-    }
+//    public static DataBase getSingleton() {
+//        if (instance == null) {
+//            instance = new DataBase();
+//        }
+//        return instance;
+//    }
 
     /**
      * Cria uma conexão com o banco.
@@ -211,7 +211,9 @@ public class DataBase {
 
     public static synchronized int pegaVersaoConexao() throws Exception{
 		
-		DataBase dataBase = DataBase.getSingleton();
+		//DataBase dataBase = DataBase.getSingleton();
+    	
+    	DataBase dataBase = new DataBase();
 		
 		int versao = 0;
 		

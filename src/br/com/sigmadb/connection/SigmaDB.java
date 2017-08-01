@@ -49,7 +49,8 @@ public class SigmaDB {
 	public ConnectionLog abrirConexaoPersistencia(String idUsuario, String origem)
 			throws Exception {
 
-		DataBase dataBase = DataBase.getSingleton();
+		//DataBase dataBase = DataBase.getSingleton();
+		DataBase dataBase = new DataBase();
 
 		Connection con = dataBase.getConnection();
 		
@@ -79,7 +80,9 @@ public class SigmaDB {
 	public ConnectionLog abrirConexaoPersistencia(String idUsuario)
 			throws Exception {
 
-		DataBase dataBase = DataBase.getSingleton();
+		//DataBase dataBase = DataBase.getSingleton();
+		
+		DataBase dataBase = new DataBase();
 
 		Connection con = dataBase.getConnection();
 		
@@ -116,7 +119,9 @@ public class SigmaDB {
 	 */
 	public ConnectionLog abrirConexaoPersistencia()	throws Exception {
 		
-		DataBase dataBase = DataBase.getSingleton();
+		//DataBase dataBase = DataBase.getSingleton();
+		
+		DataBase dataBase = new DataBase();
 
 		Connection con = dataBase.getConnection();
 
@@ -138,7 +143,9 @@ public class SigmaDB {
 	private ConnectionLog abreConexaoConsulta() throws ClassNotFoundException,
 			SQLException, SigmaDBException {
 
-		DataBase dataBase = DataBase.getSingleton();
+		//DataBase dataBase = DataBase.getSingleton();
+		
+		DataBase dataBase = new DataBase();
 
 		Connection con = dataBase.getConnection();
 
@@ -167,7 +174,9 @@ public class SigmaDB {
 				}
 			}
 
-			DataBase dataBase = DataBase.getSingleton();
+			//DataBase dataBase = DataBase.getSingleton();
+			
+			DataBase dataBase = new DataBase();
 			dataBase.grava(connectionLog.getConnection());
 		}
 	}
@@ -183,7 +192,9 @@ public class SigmaDB {
 	public void abortarConexao(ConnectionLog connectionLog)
 			throws ClassNotFoundException, SQLException {
 		if (connectionLog != null && connectionLog.getConnection() != null) {
-			DataBase dataBase = DataBase.getSingleton();
+			//DataBase dataBase = DataBase.getSingleton();
+			
+			DataBase dataBase = new DataBase();
 			dataBase.rollBack(connectionLog.getConnection());
 			connectionLog.getListaLogs().clear();
 		}
